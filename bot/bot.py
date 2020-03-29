@@ -2,6 +2,7 @@ import telebot
 
 from aggregator import Aggregator
 from config import BOT_TOKEN
+from .patterns import country_pattern
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -14,15 +15,20 @@ def start_message(message):
         message.chat.id,
         (
             'Привет, я помогаю отслеживать текущую обстановку по COVID-19.\n\n'
-            'Чтобы получить текущую информацию, введите название страны.'
+            'Чтобы получить текущую информацию, введите название страны'
+            'или "Мир".'
         )
     )
 
 
 @bot.message_handler(content_types=['text'])
-def return_total_cases(message):
+def return_country_statistics(message):
     info = aggregator.get(message.text)
     if 'error' in info:
         bot.send_message(message.chat.id, str(info['error']))
         return
-    bot.send_message(message.chat.id, str(info['total_cases']))
+    bot.send_message(
+        message.chat.id,
+        country_pattern(info),
+        parse_mode="Markdown"
+    )
