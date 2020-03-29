@@ -68,7 +68,6 @@ class Rapidapi(Source):
     def get_info(self, country=None):
         if country is None:
             country = 'all'
-        country = country.lower()
         row = self._data[self._data.country == country]
         row = row.to_dict(orient='records')
         if len(row) == 0:

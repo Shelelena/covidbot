@@ -45,7 +45,7 @@ def test_get_info():
     rapidapi = Rapidapi()
     rapidapi.load()
 
-    result = rapidapi.get_info('Iran')
+    result = rapidapi.get_info('iran')
     assert result == {
         'country': 'iran',
         'day': '2020-03-28',

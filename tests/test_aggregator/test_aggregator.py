@@ -10,7 +10,7 @@ def test_aggregator_case():
     aggr = Aggregator()
     data = aggr.get('France')
     assert data == {
-        'country': 'france',
+        'country': 'Франция',
         'day': '2020-03-28',
         'time': '2020-03-28T17:15:05+00:00',
         'new_cases': '+3809',
