@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 from config import RAPIDAPI_KEY
+from exceptions import CountryNotFound
 
 
 class Source(ABC):
@@ -51,6 +52,7 @@ class Rapidapi(Source):
         data = self._unwrap_column(data, 'deaths')
         data = data.sort_values('total_cases', ascending=False)
         data = data.reset_index(drop=True)
+        data.country = data.country.str.lower()
         return data
 
     def _unwrap_column(self, data, colname):
@@ -65,10 +67,11 @@ class Rapidapi(Source):
 
     def get_info(self, country=None):
         if country is None:
-            country = 'All'
+            country = 'all'
+        country = country.lower()
         row = self._data[self._data.country == country]
         row = row.to_dict(orient='records')
         if len(row) == 0:
-            raise KeyError(f'No such country: {country}')
+            raise CountryNotFound(f'No such country: {country}')
         row = row[0]
         return row

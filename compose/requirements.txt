@@ -2,3 +2,4 @@ ipython
 requests
 pandas
 pytest
+pytelegrambotapi

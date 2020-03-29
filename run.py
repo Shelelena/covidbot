@@ -1,4 +1,5 @@
 import asyncio
+from bot import bot
 
 
 async def main():
@@ -7,4 +8,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    bot.polling(none_stop=True)

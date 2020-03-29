@@ -4,6 +4,7 @@ import json
 import pandas as pd
 
 from aggregator.sources import Rapidapi
+from exceptions import CountryNotFound
 from mocks import mock_load
 
 
@@ -33,9 +34,9 @@ def test_prepare_data():
     assert type(data) is pd.DataFrame
     assert len(data.columns) == 10
     assert len(data) == 8
-    assert data.loc[0, 'country'] == 'USA'
-    assert data.loc[1, 'country'] == 'Italy'
-    assert data.loc[7, 'country'] == 'S.-Korea'
+    assert data.loc[0, 'country'] == 'usa'
+    assert data.loc[1, 'country'] == 'italy'
+    assert data.loc[7, 'country'] == 's.-korea'
     assert data.loc[6, 'total_deaths'] == 1995
 
 
@@ -46,7 +47,7 @@ def test_get_info():
 
     result = rapidapi.get_info('Iran')
     assert result == {
-        'country': 'Iran',
+        'country': 'iran',
         'day': '2020-03-28',
         'time': '2020-03-28T17:15:05+00:00',
         'new_cases': '+3076',
@@ -58,6 +59,6 @@ def test_get_info():
         'total_deaths': 2517
     }
 
-    with pytest.raises(KeyError) as error:
+    with pytest.raises(CountryNotFound) as error:
         rapidapi.get_info('Oz')
     assert 'No such country' in str(error.value)

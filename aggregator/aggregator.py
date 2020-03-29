@@ -1,4 +1,5 @@
 from .sources import Rapidapi
+from exceptions import CountryNotFound
 
 
 class Aggregator:
@@ -17,5 +18,8 @@ class Aggregator:
                 source.load()
 
     def _combine_data(self, country=None):
-        current_info = self._rapidapi.get_info(country)
+        try:
+            current_info = self._rapidapi.get_info(country)
+        except CountryNotFound:
+            return {'error': 'Country not found'}
         return current_info
