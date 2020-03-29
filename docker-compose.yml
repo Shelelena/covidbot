@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  
+  covidbot:
+    container_name: covidbot-container
+    build:
+      context: .
+      dockerfile: compose/Dockerfile
+    volumes:
+      - ./:/app
