@@ -10,16 +10,22 @@ def register_handlers(communicator):
             message.chat.id
         )
 
+    @bot.message_handler(commands=['all'])
+    def world(message):
+        communicator.send_country_statistics(
+            message.chat.id, 'all'
+        )
+
     @bot.message_handler(commands=['rating'])
     def rating(message):
         communicator.send_rating(
             message.chat.id
         )
 
-    country_command_pattern = r'^/country_(\S+)$'
-    @bot.message_handler(regexp=country_command_pattern)
+    @bot.message_handler(regexp=communicator.patterns.country_command)
     def country_link(message):
-        country = re.search(country_command_pattern, message.text).group(1)
+        pattern = communicator.patterns.country_command
+        country = re.search(pattern, message.text).group(1)
         communicator.send_country_statistics(
             message.chat.id,
             country=country

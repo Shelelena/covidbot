@@ -28,12 +28,25 @@ def test_country_statistics(comm):
         'chat_id_2', comm.patterns.country(), parse_mode="Markdown")
 
 
+def test_world_statistics(comm):
+    comm.aggregator.get.return_value = {'key': 'all'}
+    comm.send_country_statistics('chat_id_5', 'country_3')
+
+    comm.aggregator.rating.assert_called_once_with(1, 5)
+    comm.patterns.world.assert_called_once_with(
+        comm.aggregator.get(), comm.aggregator.rating())
+    comm.bot.send_message.assert_called_once_with(
+        'chat_id_5', comm.patterns.world(), parse_mode="Markdown")
+
+
 def test_country_statistics_with_error(comm):
     comm.aggregator.get.return_value = {'error': 'error_msg'}
     comm.send_country_statistics('chat_id_3', 'country_2')
 
+    comm.patterns.error.assert_called_once_with(
+        comm.aggregator.get())
     comm.bot.send_message.assert_called_once_with(
-        'chat_id_3', 'error_msg')
+        'chat_id_3', comm.patterns.error())
 
 
 def test_rating_message(comm):

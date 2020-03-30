@@ -1,5 +1,8 @@
 class Patterns:
 
+    def __init__(self):
+        self.country_command = r'^/country_(\S+)$'
+
     def greeting(self):
         return (
             'Привет, я помогаю отслеживать текущую обстановку '
@@ -11,6 +14,13 @@ class Patterns:
 
     def country(self, info):
         return (
+            self._country(info)
+            + '\n' + self._reload(info)
+            + self._go_to_rating()
+        )
+
+    def _country(self, info):
+        return (
             f"*{info['country']}*\n\n"
             + self._detailed([
                 ('Всего подтвержденных случаев', 'total_cases'),
@@ -19,16 +29,30 @@ class Patterns:
                 ('Погибших за последние сутки', 'new_deaths'),
                 ('Выздоровевшие', 'recovered_cases'),
             ], info)
+        )
+
+    def world(self, info, rating):
+        return (
+            self._country(info)
+            + '\n\n*Топ 5 стран*\n\n'
+            + self.rating(rating)
             + '\n' + self._reload(info)
             + self._go_to_rating()
         )
 
-    def rating(self, rating, world):
+    def rating(self, rating, world=None):
         pattern = self._in_one_line(rating, code=True)
         if world is not None:
             world_pattern = self._in_one_line(world, bald=True)
             pattern = world_pattern + '\n\n' + pattern
         return pattern
+
+    def error(self, info):
+        return (
+            info['error'] + '\n'
+            + self._go_to_all()
+            + self._go_to_rating()
+        )
 
     def _vectorize(function):
         def wrapped(self, argument, *args, **kwargs):
@@ -63,7 +87,12 @@ class Patterns:
         return f'\n{self._link(info)} - обновить данные'
 
     def _go_to_rating(self):
-        return '\n/rating - перейти к рейтингу стран'
+        return '\n/rating - рейтинг стран'
+
+    def _go_to_all(self):
+        return '\n/all - статистика по миру'
 
     def _link(self, info):
+        if info['key'] == 'all':
+            return '/all'
         return '/country\\_' + info['key']

@@ -19,13 +19,12 @@ class Communicator:
     def send_country_statistics(self, chat_id, country):
         info = self.aggregator.get(country)
         if 'error' in info:
-            self.bot.send_message(chat_id, str(info['error']))
-            return
-        self.bot.send_message(
-            chat_id,
-            self.patterns.country(info),
-            parse_mode="Markdown"
-        )
+            self._send_error(chat_id, info)
+        elif info['key'] == 'all':
+            rating = self.aggregator.rating(1, 5)
+            self._send_world(chat_id, info, rating)
+        else:
+            self._send_country(chat_id, info)
 
     def send_rating(self, chat_id):
         world = self.aggregator.get('all')
@@ -34,4 +33,24 @@ class Communicator:
             chat_id,
             self.patterns.rating(rating, world),
             parse_mode="Markdown"
+        )
+
+    def _send_country(self, chat_id, info):
+        self.bot.send_message(
+            chat_id,
+            self.patterns.country(info),
+            parse_mode="Markdown"
+        )
+
+    def _send_world(self, chat_id, info, rating):
+        self.bot.send_message(
+            chat_id,
+            self.patterns.world(info, rating),
+            parse_mode="Markdown"
+        )
+
+    def _send_error(self, chat_id, info):
+        self.bot.send_message(
+            chat_id,
+            self.patterns.error(info)
         )
