@@ -1,3 +1,6 @@
+import re
+
+
 def register_handlers(communicator):
     bot = communicator.bot
 
@@ -11,6 +14,15 @@ def register_handlers(communicator):
     def rating(message):
         communicator.send_rating(
             message.chat.id
+        )
+
+    country_command_pattern = r'^/country_(\S+)$'
+    @bot.message_handler(regexp=country_command_pattern)
+    def country_link(message):
+        country = re.search(country_command_pattern, message.text).group(1)
+        communicator.send_country_statistics(
+            message.chat.id,
+            country=country
         )
 
     @bot.message_handler(content_types=['text'])

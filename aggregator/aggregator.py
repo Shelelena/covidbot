@@ -27,6 +27,7 @@ class Aggregator:
         country = self._dictionary.name_to_key(country)
         try:
             current_info = self._rapidapi.get_info(country)
+            current_info['link'] = self._dictionary.key_to_link(country)
             current_info['country'] = self._dictionary.key_to_name(country)
         except CountryNotFound:
             current_info = {'error': 'Country not found'}
@@ -37,6 +38,7 @@ class Aggregator:
         rating = [
             {
                 'country': self._dictionary.key_to_name(country['country']),
+                'link': self._dictionary.key_to_link(country['country']),
                 'total_cases': country['total_cases'],
             }
             for country in rating

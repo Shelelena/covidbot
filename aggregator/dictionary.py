@@ -22,3 +22,6 @@ class Dictionary:
             return self._keys_to_names[key]
         else:
             return key
+
+    def key_to_link(self, key):
+        return r'/country\_' + key
