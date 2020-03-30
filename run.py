@@ -1,11 +1,17 @@
-import asyncio
-from bot import bot
+import telebot
+
+from bot import register_handlers
+from aggregator import Aggregator
+from config import BOT_TOKEN
 
 
-async def main():
-    while True:
-        await asyncio.sleep(1)
+def main():
+    bot = telebot.TeleBot(BOT_TOKEN)
+    aggregator = Aggregator()
+
+    register_handlers(bot, aggregator)
+    bot.polling(none_stop=True)
 
 
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
+    main()
