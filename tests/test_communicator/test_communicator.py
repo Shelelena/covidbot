@@ -18,6 +18,16 @@ def test_greeting(comm):
         'chat_id_1', comm.patterns.greeting())
 
 
+def test_help(comm):
+    comm.send_help('chat_id_10')
+
+    comm.patterns.help.assert_called_once()
+    comm.bot.send_message.assert_called_once_with(
+        'chat_id_10',
+        comm.patterns.help(),
+        disable_web_page_preview=True)
+
+
 def test_country_statistics(comm):
     comm.send_country_statistics('chat_id_2', 'country_1')
 

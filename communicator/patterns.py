@@ -1,15 +1,33 @@
 class Patterns:
 
     def __init__(self):
-        self.country_command = r'^/country_(\S+)$'
+        self.country_command = r'^/c_(\S+)$'
+
+    def _link(self, info):
+        if info['key'] == 'all':
+            return '/all'
+        return '/c\\_' + info['key']
 
     def greeting(self):
         return (
-            'Привет, я помогаю отслеживать текущую обстановку '
+            'Привет, я помогаю отслеживать обстановку '
             'по COVID-19.\n\n'
-            'Чтобы получить текущую информацию, введите название страны '
-            'или "Мир".\n\n'
-            '/rating - рейтинг стран по заболеваемости.'
+            'Чтобы получить текущую информацию, введите название страны.\n'
+            + self._go_to_all()
+            + self._go_to_rating()
+            + self._go_to_help()
+        )
+
+    def help(self):
+        return (
+            '/all - статистика по миру\n'
+            '/rating - рейтинг стран по заболеваемости\n'
+            '/c_russia - статистика по россии\n'
+            '/help - эта справка\n\n'
+            'Чтобы получить текущую информацию по любой стране, введите '
+            'название страны. Для получения информации по миру, введите '
+            '"мир" или "все".\n\n'
+            'Источник данных - https://rapidapi.com/api-sports/api/covid-193'
         )
 
     def country(self, info):
@@ -52,6 +70,7 @@ class Patterns:
             info['error'] + '\n'
             + self._go_to_all()
             + self._go_to_rating()
+            + self._go_to_help()
         )
 
     def _vectorize(function):
@@ -92,7 +111,5 @@ class Patterns:
     def _go_to_all(self):
         return '\n/all - статистика по миру'
 
-    def _link(self, info):
-        if info['key'] == 'all':
-            return '/all'
-        return '/country\\_' + info['key']
+    def _go_to_help(self):
+        return '\n/help - справка'

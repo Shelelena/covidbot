@@ -19,6 +19,12 @@ def test_greeting_pattern():
     assert type(greeting) is str
 
 
+def test_help_pattern():
+    patterns = Patterns()
+    greeting = patterns.help()
+    assert type(greeting) is str
+
+
 def test_error():
     patterns = Patterns()
     error_info = {'error': 'Test error'}
@@ -26,7 +32,8 @@ def test_error():
     assert result == (
         'Test error\n\n'
         '/all - статистика по миру\n'
-        '/rating - рейтинг стран'
+        '/rating - рейтинг стран\n'
+        '/help - справка'
     )
 
 
@@ -53,7 +60,7 @@ def test_country_pattern():
         'Всего погибших:\n`1995`\n'
         'Погибших за последние сутки:\n`+299`\n'
         'Выздоровевшие:\n`5700`\n\n'
-        '/country\\_france - обновить данные\n'
+        '/c\\_france - обновить данные\n'
         '/rating - рейтинг стран'
     )
 
@@ -68,7 +75,7 @@ def test_country_pattern_on_aggregator(aggr):
         'Всего погибших:\n`1995`\n'
         'Погибших за последние сутки:\n`+299`\n'
         'Выздоровевшие:\n`5700`\n\n'
-        '/country\\_france - обновить данные\n'
+        '/c\\_france - обновить данные\n'
         '/rating - рейтинг стран'
     )
 
@@ -85,9 +92,9 @@ def test_world_pattern_on_aggregator(aggr):
         'Погибших за последние сутки:\n`+5001`\n'
         'Выздоровевшие:\n`101010`\n\n'
         '*Топ 5 стран*\n\n'
-        '`112560` США    -> /country\\_usa\n'
-        '`86498` Италия    -> /country\\_italy\n'
-        '`81394` Китай    -> /country\\_china\n\n'
+        '`112560` США    -> /c\\_usa\n'
+        '`86498` Италия    -> /c\\_italy\n'
+        '`81394` Китай    -> /c\\_china\n\n'
         '/all - обновить данные\n'
         '/rating - рейтинг стран'
     )
@@ -99,7 +106,7 @@ def test_rating_pattern_on_aggregator(aggr):
     result = Patterns().rating(rating, world)
     assert result == (
         '*723319 Мир*    -> /all\n\n'
-        '`112560` США    -> /country\\_usa\n'
-        '`86498` Италия    -> /country\\_italy\n'
-        '`81394` Китай    -> /country\\_china'
+        '`112560` США    -> /c\\_usa\n'
+        '`86498` Италия    -> /c\\_italy\n'
+        '`81394` Китай    -> /c\\_china'
     )

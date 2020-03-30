@@ -10,6 +10,12 @@ def register_handlers(communicator):
             message.chat.id
         )
 
+    @bot.message_handler(commands=['help'])
+    def help(message):
+        communicator.send_help(
+            message.chat.id
+        )
+
     @bot.message_handler(commands=['all'])
     def world(message):
         communicator.send_country_statistics(

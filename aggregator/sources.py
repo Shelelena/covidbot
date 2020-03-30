@@ -3,6 +3,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 import pandas as pd
+import logging
 
 from exceptions import CountryNotFound, NoRapidapiKey
 from .dictionary import Dictionary
@@ -60,6 +61,8 @@ class Rapidapi(Source):
         data.key = data.key.str.replace(r'[\.\-\&\;]', '')
         data['country'] = data.key.map(self._dictionary.key_to_name())
         data['number'] = list(range(len(data)))
+        if len(self._new_countries(data)) > 0:
+            logging.debug(f'New countries: {str(self._new_countries(data))}')
         return data
 
     def _unwrap_column(self, data, colname):
@@ -71,6 +74,11 @@ class Rapidapi(Source):
         data = data.join(unwrapped_data)
         del(data[colname])
         return data
+
+    def _new_countries(self, data):
+        new_data = set(data.key)
+        old_data = set(self._dictionary.key_to_name())
+        return new_data - old_data
 
     def get_info(self, country=None):
         if country is None:
