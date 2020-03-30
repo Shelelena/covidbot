@@ -10,18 +10,19 @@ class Dictionary:
         with open(dir_path + '/names_to_keys.json') as file:
             self._names_to_keys = json.load(file)
 
-    def name_to_key(self, name):
+    def name_to_key(self, name=None):
+        if name is None:
+            return self._names_to_keys
         name = name.lower()
         if name in self._names_to_keys:
             return self._names_to_keys[name]
         else:
             return name
 
-    def key_to_name(self, key):
+    def key_to_name(self, key=None):
+        if key is None:
+            return self._keys_to_names
         if key in self._keys_to_names:
             return self._keys_to_names[key]
         else:
             return key
-
-    def key_to_link(self, key):
-        return r'/country\_' + key

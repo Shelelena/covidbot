@@ -5,7 +5,7 @@ import pandas as pd
 
 from aggregator.sources import Rapidapi
 from exceptions import CountryNotFound
-from mocks import mock_load
+from .mocks import mock_load
 
 
 def test_unwrap_column():
@@ -32,11 +32,11 @@ def test_prepare_data():
     data = rapidapi._prepare_data(data)
 
     assert type(data) is pd.DataFrame
-    assert len(data.columns) == 10
+    assert len(data.columns) == 12
     assert len(data) == 9
-    assert data.loc[0, 'country'] == 'all'
-    assert data.loc[1, 'country'] == 'usa'
-    assert data.loc[8, 'country'] == 's.-korea'
+    assert data.loc[0, 'key'] == 'all'
+    assert data.loc[1, 'key'] == 'usa'
+    assert data.loc[8, 'key'] == 's.-korea'
     assert data.loc[7, 'total_deaths'] == 1995
 
 
@@ -47,7 +47,8 @@ def test_get_info():
 
     result = rapidapi.get_info('iran')
     assert result == {
-        'country': 'iran',
+        'key': 'iran',
+        'country': 'Иран',
         'day': '2020-03-28',
         'time': '2020-03-28T17:15:05+00:00',
         'new_cases': '+3076',
@@ -56,7 +57,8 @@ def test_get_info():
         'recovered_cases': 11679,
         'total_cases': 35408,
         'new_deaths': '+139',
-        'total_deaths': 2517
+        'total_deaths': 2517,
+        'number': 6,
     }
 
     with pytest.raises(CountryNotFound) as error:
@@ -70,11 +72,11 @@ def test_range():
     rapidapi.load()
 
     world = rapidapi.range(0, 0)
-    assert world[0]['country'] == 'all'
+    assert world[0]['key'] == 'all'
 
     result = rapidapi.range(1, 5)
     assert len(result) == 5
-    countries = [i['country'] for i in result]
+    countries = [i['key'] for i in result]
     assert countries == ['usa', 'italy', 'china', 'spain', 'germany']
     total_cases = [i['total_cases'] for i in result]
     assert total_cases == sorted(total_cases, reverse=True)

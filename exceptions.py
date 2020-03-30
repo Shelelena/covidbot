@@ -4,3 +4,7 @@ class CovidBotException(Exception):
 
 class CountryNotFound(CovidBotException):
     pass
+
+
+class NoRapidapiKey(CovidBotException):
+    pass

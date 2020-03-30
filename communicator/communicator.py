@@ -1,10 +1,11 @@
-from .patterns import country_pattern, rating_pattern
+from .patterns import Patterns
 
 
 class Communicator:
     def __init__(self, bot, aggregator):
         self.bot = bot
         self.aggregator = aggregator
+        self.patterns = Patterns()
 
     def run_bot(self):
         self.bot.polling(none_stop=True)
@@ -12,13 +13,7 @@ class Communicator:
     def send_greeting(self, chat_id):
         self.bot.send_message(
             chat_id,
-            (
-                'Привет, я помогаю отслеживать текущую обстановку '
-                'по COVID-19.\n\n'
-                'Чтобы получить текущую информацию, введите название страны '
-                'или "Мир".\n\n'
-                '/rating - рейтинг стран по заболеваемости.'
-            )
+            self.patterns.greeting()
         )
 
     def send_country_statistics(self, chat_id, country):
@@ -28,7 +23,7 @@ class Communicator:
             return
         self.bot.send_message(
             chat_id,
-            country_pattern(info),
+            self.patterns.country(info),
             parse_mode="Markdown"
         )
 
@@ -37,6 +32,6 @@ class Communicator:
         rating = self.aggregator.rating(1, 10)
         self.bot.send_message(
             chat_id,
-            rating_pattern(world, rating),
+            self.patterns.rating(rating, world),
             parse_mode="Markdown"
         )

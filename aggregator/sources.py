@@ -4,7 +4,8 @@ import json
 from datetime import datetime, timedelta
 import pandas as pd
 
-from exceptions import CountryNotFound
+from exceptions import CountryNotFound, NoRapidapiKey
+from .dictionary import Dictionary
 
 
 class Source(ABC):
@@ -27,13 +28,16 @@ class Source(ABC):
 
 
 class Rapidapi(Source):
-    def __init__(self, key):
+    def __init__(self, key=None):
         self._key = key
         self._data = None
         self._last_updated = None
         self._expire_time = timedelta(minutes=10)
+        self._dictionary = Dictionary()
 
     def _load(self):
+        if self._key is None:
+            raise NoRapidapiKey
         response = requests.request(
             "GET",
             "https://covid-193.p.rapidapi.com/statistics",
@@ -52,7 +56,9 @@ class Rapidapi(Source):
         data = self._unwrap_column(data, 'deaths')
         data = data.sort_values('total_cases', ascending=False)
         data = data.reset_index(drop=True)
-        data.country = data.country.str.lower()
+        data['key'] = data.country.str.lower()
+        data['country'] = data.key.map(self._dictionary.key_to_name())
+        data['number'] = list(range(len(data)))
         return data
 
     def _unwrap_column(self, data, colname):
@@ -68,7 +74,8 @@ class Rapidapi(Source):
     def get_info(self, country=None):
         if country is None:
             country = 'all'
-        row = self._data[self._data.country == country]
+        country = self._dictionary.name_to_key(country)
+        row = self._data[self._data.key == country]
         row = row.to_dict(orient='records')
         if len(row) == 0:
             raise CountryNotFound(f'No such country: {country}')

@@ -2,7 +2,7 @@ from unittest.mock import patch, MagicMock
 
 from aggregator import Aggregator
 from aggregator.sources import Rapidapi
-from mocks import mock_load
+from .mocks import mock_load
 
 
 @patch.object(Rapidapi, '_load', mock_load)
@@ -10,6 +10,7 @@ def test_aggregator_case():
     aggr = Aggregator()
     data = aggr.get('France')
     assert data == {
+        'key': 'france',
         'country': 'Франция',
         'day': '2020-03-28',
         'time': '2020-03-28T17:15:05+00:00',
@@ -19,7 +20,8 @@ def test_aggregator_case():
         'recovered_cases': 5700,
         'total_cases': 32964,
         'new_deaths': '+299',
-        'total_deaths': 1995
+        'total_deaths': 1995,
+        'number': 7,
     }
 
 
@@ -41,6 +43,7 @@ def test_aggregator_calls():
     assert aggr._rapidapi.get_info.call_count == 3
 
 
+@patch.object(Rapidapi, '_load', mock_load)
 def test_wrong_country():
     aggr = Aggregator()
     result = aggr.get('Oz')
