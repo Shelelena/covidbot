@@ -4,7 +4,6 @@ import json
 from datetime import datetime, timedelta
 import pandas as pd
 
-from config import RAPIDAPI_KEY
 from exceptions import CountryNotFound
 
 
@@ -28,7 +27,8 @@ class Source(ABC):
 
 
 class Rapidapi(Source):
-    def __init__(self):
+    def __init__(self, key):
+        self._key = key
         self._data = None
         self._last_updated = None
         self._expire_time = timedelta(minutes=10)
@@ -39,7 +39,7 @@ class Rapidapi(Source):
             "https://covid-193.p.rapidapi.com/statistics",
             headers={
                 'x-rapidapi-host': "covid-193.p.rapidapi.com",
-                'x-rapidapi-key': RAPIDAPI_KEY,
+                'x-rapidapi-key': self._key,
             }
         )
         return response.text

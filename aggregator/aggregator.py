@@ -4,8 +4,8 @@ from .dictionary import Dictionary
 
 
 class Aggregator:
-    def __init__(self):
-        self._rapidapi = Rapidapi()
+    def __init__(self, rapidapi_key):
+        self._rapidapi = Rapidapi(rapidapi_key)
         self._rapidapi.load()
         self._sources = [self._rapidapi]
         self._dictionary = Dictionary()

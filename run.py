@@ -1,16 +1,17 @@
 import telebot
 
-from bot import register_handlers
+from communicator import register_handlers, Communicator
 from aggregator import Aggregator
-from config import BOT_TOKEN
+from config import BOT_TOKEN, RAPIDAPI_KEY
 
 
 def main():
     bot = telebot.TeleBot(BOT_TOKEN)
-    aggregator = Aggregator()
+    aggregator = Aggregator(rapidapi_key=RAPIDAPI_KEY)
+    communicator = Communicator(bot, aggregator)
+    register_handlers(communicator)
 
-    register_handlers(bot, aggregator)
-    bot.polling(none_stop=True)
+    communicator.run_bot()
 
 
 if __name__ == '__main__':
