@@ -74,3 +74,8 @@ class Rapidapi(Source):
             raise CountryNotFound(f'No such country: {country}')
         row = row[0]
         return row
+
+    def range(self, start=1, end=10):
+        range_data = self._data.loc[start: end]
+        range_data = range_data.to_dict(orient='records')
+        return range_data

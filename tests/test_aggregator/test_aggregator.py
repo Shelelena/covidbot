@@ -46,3 +46,18 @@ def test_wrong_country():
     result = aggr.get('Oz')
     assert len(result) == 1
     assert 'error' in result
+
+
+@patch.object(Rapidapi, '_load', mock_load)
+def test_aggergator_rating():
+    aggr = Aggregator()
+
+    rating = aggr.rating(1, 5)
+    assert len(rating) == 5
+    countries = [i['country'] for i in rating]
+    assert countries == ['США', 'Италия', 'Китай', 'Испания', 'Германия']
+    total_cases = [i['total_cases'] for i in rating]
+    assert total_cases == sorted(total_cases, reverse=True)
+
+    empty_rating = aggr.rating(10, 15)
+    assert empty_rating == []

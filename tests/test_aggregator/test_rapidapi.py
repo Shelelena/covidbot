@@ -33,11 +33,11 @@ def test_prepare_data():
 
     assert type(data) is pd.DataFrame
     assert len(data.columns) == 10
-    assert len(data) == 8
-    assert data.loc[0, 'country'] == 'usa'
-    assert data.loc[1, 'country'] == 'italy'
-    assert data.loc[7, 'country'] == 's.-korea'
-    assert data.loc[6, 'total_deaths'] == 1995
+    assert len(data) == 9
+    assert data.loc[0, 'country'] == 'all'
+    assert data.loc[1, 'country'] == 'usa'
+    assert data.loc[8, 'country'] == 's.-korea'
+    assert data.loc[7, 'total_deaths'] == 1995
 
 
 @patch.object(Rapidapi, '_load', mock_load)
@@ -62,3 +62,31 @@ def test_get_info():
     with pytest.raises(CountryNotFound) as error:
         rapidapi.get_info('Oz')
     assert 'No such country' in str(error.value)
+
+
+@patch.object(Rapidapi, '_load', mock_load)
+def test_range():
+    rapidapi = Rapidapi()
+    rapidapi.load()
+
+    world = rapidapi.range(0, 0)
+    assert world[0]['country'] == 'all'
+
+    result = rapidapi.range(1, 5)
+    assert len(result) == 5
+    countries = [i['country'] for i in result]
+    assert countries == ['usa', 'italy', 'china', 'spain', 'germany']
+    total_cases = [i['total_cases'] for i in result]
+    assert total_cases == sorted(total_cases, reverse=True)
+
+
+@patch.object(Rapidapi, '_load', mock_load)
+def test_range_out_of_range():
+    rapidapi = Rapidapi()
+    rapidapi.load()
+
+    result = rapidapi.range(15, 20)
+    assert len(result) == 0
+
+    result = rapidapi.range(5, 15)
+    assert len(result) == 4

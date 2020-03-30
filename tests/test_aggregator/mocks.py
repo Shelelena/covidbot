@@ -32,4 +32,8 @@ def mock_load(self=None):
             '{"country":"S.-Korea","cases":{"new":"+146","active":4523,'
             '"critical":59,"recovered":4811,"total":9478},'
             '"deaths":{"new":"+5","total":144},"day":"2020-03-28",'
+            '"time":"2020-03-28T17:15:05+00:00"},'
+            '{"country":"All","cases":{"new":"+960","active":606060,'
+            '"critical":202020,"recovered":101010,"total":723319},'
+            '"deaths":{"new":"+5001","total":33993},"day":"2020-03-28",'
             '"time":"2020-03-28T17:15:05+00:00"}]}')

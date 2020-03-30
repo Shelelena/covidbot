@@ -2,7 +2,7 @@ import telebot
 
 from aggregator import Aggregator
 from config import BOT_TOKEN
-from .patterns import country_pattern
+from .patterns import country_pattern, rating_pattern
 
 
 bot = telebot.TeleBot(BOT_TOKEN)
@@ -15,9 +15,21 @@ def start_message(message):
         message.chat.id,
         (
             'Привет, я помогаю отслеживать текущую обстановку по COVID-19.\n\n'
-            'Чтобы получить текущую информацию, введите название страны'
-            'или "Мир".'
+            'Чтобы получить текущую информацию, введите название страны '
+            'или "Мир".\n\n'
+            '/rating - рейтинг стран по заболеваемости'
         )
+    )
+
+
+@bot.message_handler(commands=['rating'])
+def get_rating(message):
+    world = aggregator.get('all')
+    rating = aggregator.rating(1, 10)
+    bot.send_message(
+        message.chat.id,
+        rating_pattern(world, rating),
+        parse_mode="Markdown"
     )
 
 
