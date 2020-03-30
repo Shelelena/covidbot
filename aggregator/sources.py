@@ -57,6 +57,7 @@ class Rapidapi(Source):
         data = data.sort_values('total_cases', ascending=False)
         data = data.reset_index(drop=True)
         data['key'] = data.country.str.lower()
+        data.key = data.key.str.replace(r'[\.\-\&\;]', '')
         data['country'] = data.key.map(self._dictionary.key_to_name())
         data['number'] = list(range(len(data)))
         return data

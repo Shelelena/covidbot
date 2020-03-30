@@ -30,10 +30,13 @@ def test_country_pattern():
     country = Patterns().country(info)
     assert country == (
         '*Франция*\n\n'
-        'Всего: 32964\n'
-        'Новые случаи: +3809\n'
-        'Погибшие: 1995\n'
-        'Выздоровевшие: 5700'
+        'Всего подтвержденных случаев:\n`32964`\n'
+        'Новые случаи за сутки:\n`+3809`\n'
+        'Всего погибших:\n`1995`\n'
+        'Погибших за последние сутки:\n`+299`\n'
+        'Выздоровевшие:\n`5700`\n\n'
+        '/country\\_france - обновить данные\n'
+        '/rating - перейти к рейтингу стран'
     )
 
 
@@ -43,10 +46,13 @@ def test_country_pattern_on_aggregator():
     country = Patterns().country(info)
     assert country == (
         '*Франция*\n\n'
-        'Всего: 32964\n'
-        'Новые случаи: +3809\n'
-        'Погибшие: 1995\n'
-        'Выздоровевшие: 5700'
+        'Всего подтвержденных случаев:\n`32964`\n'
+        'Новые случаи за сутки:\n`+3809`\n'
+        'Всего погибших:\n`1995`\n'
+        'Погибших за последние сутки:\n`+299`\n'
+        'Выздоровевшие:\n`5700`\n\n'
+        '/country\\_france - обновить данные\n'
+        '/rating - перейти к рейтингу стран'
     )
 
 
@@ -56,12 +62,8 @@ def test_rating_pattern_on_aggregator():
     world = Aggregator().get()
     result = Patterns().rating(rating, world)
     assert result == (
-        '*Мир: 723319*\n'
-        '/country\\_all\n\n'
-        '1. США: 112560\n'
-        '/country\\_usa\n'
-        '2. Италия: 86498\n'
-        '/country\\_italy\n'
-        '3. Китай: 81394\n'
-        '/country\\_china'
+        '*723319 Мир*    -> /country\\_all\n\n'
+        '`112560` США    -> /country\\_usa\n'
+        '`86498` Италия    -> /country\\_italy\n'
+        '`81394` Китай    -> /country\\_china'
     )

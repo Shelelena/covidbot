@@ -29,7 +29,7 @@ class Communicator:
 
     def send_rating(self, chat_id):
         world = self.aggregator.get('all')
-        rating = self.aggregator.rating(1, 10)
+        rating = self.aggregator.rating(1, 20)
         self.bot.send_message(
             chat_id,
             self.patterns.rating(rating, world),

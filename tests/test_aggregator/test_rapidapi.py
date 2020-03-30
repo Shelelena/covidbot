@@ -36,7 +36,7 @@ def test_prepare_data():
     assert len(data) == 9
     assert data.loc[0, 'key'] == 'all'
     assert data.loc[1, 'key'] == 'usa'
-    assert data.loc[8, 'key'] == 's.-korea'
+    assert data.loc[8, 'key'] == 'skorea'
     assert data.loc[7, 'total_deaths'] == 1995
 
 

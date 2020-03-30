@@ -27,7 +27,7 @@ class Aggregator:
         try:
             current_info = self._rapidapi.get_info(country)
         except CountryNotFound:
-            current_info = {'error': 'Country not found'}
+            current_info = {'error': 'Страна не найдена'}
         return current_info
 
     def _combine_rating_data(self, start=1, end=10):
