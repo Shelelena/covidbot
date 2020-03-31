@@ -27,7 +27,9 @@ class Patterns:
             'Чтобы получить текущую информацию по любой стране, введите '
             'название страны. Для получения информации по миру, введите '
             '"мир" или "все".\n\n'
-            'Источник данных - https://rapidapi.com/api-sports/api/covid-193'
+            'Источник данных - https://rapidapi.com/api-sports/api/covid-193. '
+            'Данные обновляются раз в 15 минут.\n'
+            'Баг репорт - @shel_elena'
         )
 
     def country(self, info):
@@ -42,9 +44,9 @@ class Patterns:
             f"*{info['country']}*\n\n"
             + self._detailed([
                 ('Всего подтвержденных случаев', 'total_cases'),
-                ('Новые случаи за сутки', 'new_cases'),
+                ('Новые случаи за сегодня', 'new_cases'),
                 ('Всего погибших', 'total_deaths'),
-                ('Погибших за последние сутки', 'new_deaths'),
+                ('Погибших за сегодня', 'new_deaths'),
                 ('Выздоровевшие', 'recovered_cases'),
             ], info)
         )
@@ -86,7 +88,10 @@ class Patterns:
     @_vectorize
     def _detailed(self, format, info):
         label, name = format
-        return f'{label}:\n`{info[name]}`'
+        data = info[name]
+        if data is None:
+            data = 'Нет'
+        return f'{label}:\n`{data}`'
 
     @_vectorize
     def _in_one_line(self, info, number=False, code=False, bald=False):
@@ -99,7 +104,6 @@ class Patterns:
         line += '    -> ' + self._link(info)
         if number:
             line = str(info['number']) + '. ' + line
-        # line = line + '\n'
         return line
 
     def _reload(self, info):

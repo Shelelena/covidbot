@@ -1,4 +1,5 @@
 import logging
+import time
 from datetime import datetime
 from .patterns import Patterns
 
@@ -9,22 +10,34 @@ class Communicator:
         self.aggregator = aggregator
         self.patterns = Patterns()
 
+    def run_bot(self):
+        while True:
+            try:
+                self.bot.polling(none_stop=True, timeout=60)
+            except Exception:
+                logging.exception(
+                    'top level exception; '
+                    f'{str(datetime.now())}'
+                )
+                self.bot.stop_polling()
+                time.sleep(15)
+
     def catch_uncatched(function):
         def wrapped(self, chat_id, *args, **kwargs):
             try:
                 return function(self, chat_id, *args, **kwargs)
             except Exception:
                 logging.exception(
-                    f'time: {str(datetime.now())}; chat: {chat_id}')
+                    f'uncatched catched: {str(datetime.now())}; '
+                    f'chat: {chat_id}'
+                )
                 self._send_error(
-                    chat_id, {'error': 'Случилось что-то странное'})
+                    chat_id, {'error': 'Случилась какая-то ошибка. Извините.'})
         return wrapped
-
-    def run_bot(self):
-        self.bot.polling(none_stop=True)
 
     @catch_uncatched
     def send_greeting(self, chat_id):
+        logging.debug(f'new greeting! chat_id: {chat_id}')
         self.bot.send_message(
             chat_id,
             self.patterns.greeting()
