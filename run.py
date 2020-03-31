@@ -7,7 +7,7 @@ from config import BOT_TOKEN, RAPIDAPI_KEY, LOG_FILE
 
 
 def main():
-    logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
+    logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
 
     bot = telebot.TeleBot(BOT_TOKEN)
     aggregator = Aggregator(rapidapi_key=RAPIDAPI_KEY)

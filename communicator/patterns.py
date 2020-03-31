@@ -61,7 +61,7 @@ class Patterns:
         )
 
     def rating(self, rating, world=None):
-        pattern = self._in_one_line(rating, code=True)
+        pattern = self._in_one_line(rating, code=True, number=True)
         if world is not None:
             world_pattern = self._in_one_line(world, bald=True)
             pattern = world_pattern + '\n\n' + pattern
@@ -98,7 +98,7 @@ class Patterns:
         line = str(info['total_cases'])
         if code:
             line = '`' + line + '`'
-        line = line + ' ' + info['country']
+        line = line + ' ' + str(info['country'])
         if bald:
             line = '*' + line + '*'
         line += '    -> ' + self._link(info)

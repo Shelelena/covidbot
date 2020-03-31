@@ -28,6 +28,14 @@ def register_handlers(communicator):
             message.chat.id
         )
 
+    @bot.callback_query_handler(func=lambda call: True)
+    def callback(call):
+        communicator.edit_rating(
+            chat_id=call.message.chat.id,
+            message_id=call.message.message_id,
+            number=call.data
+        )
+
     @bot.message_handler(regexp=communicator.patterns.country_command)
     def country_link(message):
         pattern = communicator.patterns.country_command

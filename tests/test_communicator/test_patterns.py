@@ -92,9 +92,9 @@ def test_world_pattern_on_aggregator(aggr):
         'Погибших за сегодня:\n`+5001`\n'
         'Выздоровевшие:\n`101010`\n\n'
         '*Топ 5 стран*\n\n'
-        '`112560` США    -> /c\\_usa\n'
-        '`86498` Италия    -> /c\\_italy\n'
-        '`81394` Китай    -> /c\\_china\n\n'
+        '1. `112560` США    -> /c\\_usa\n'
+        '2. `86498` Италия    -> /c\\_italy\n'
+        '3. `81394` Китай    -> /c\\_china\n\n'
         '/all - обновить данные\n'
         '/rating - рейтинг стран'
     )
@@ -106,7 +106,7 @@ def test_rating_pattern_on_aggregator(aggr):
     result = Patterns().rating(rating, world)
     assert result == (
         '*723319 Мир*    -> /all\n\n'
-        '`112560` США    -> /c\\_usa\n'
-        '`86498` Италия    -> /c\\_italy\n'
-        '`81394` Китай    -> /c\\_china'
+        '1. `112560` США    -> /c\\_usa\n'
+        '2. `86498` Италия    -> /c\\_italy\n'
+        '3. `81394` Китай    -> /c\\_china'
     )

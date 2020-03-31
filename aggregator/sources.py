@@ -56,13 +56,14 @@ class Rapidapi(Source):
         data = self._unwrap_column(data, 'cases')
         data = self._unwrap_column(data, 'deaths')
         data = data.sort_values('total_cases', ascending=False)
-        data = data.reset_index(drop=True)
         data['key'] = data.country.str.lower()
         data.key = data.key.str.replace(r'[\.\-\&\;]', '')
+        data = data.drop_duplicates(subset=['key'])
         data['country'] = data.key.map(self._dictionary.key_to_name())
+        data = data.reset_index(drop=True)
         data['number'] = list(range(len(data)))
         if len(self._new_countries(data)) > 0:
-            logging.debug(f'New countries: {str(self._new_countries(data))}')
+            logging.info(f'New countries: {str(self._new_countries(data))}')
         return data
 
     def _unwrap_column(self, data, colname):
