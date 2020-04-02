@@ -7,8 +7,11 @@ class Dictionary:
         dir_path = os.path.dirname(os.path.realpath(__file__))
         with open(dir_path + '/keys_to_names.json') as file:
             self._keys_to_names = json.load(file)
+        _names_to_keys = {
+            name.lower(): key
+            for key, name in self._keys_to_names.items()}
         with open(dir_path + '/names_to_keys.json') as file:
-            self._names_to_keys = json.load(file)
+            self._names_to_keys = {**json.load(file), **_names_to_keys}
 
     def name_to_key(self, name=None):
         if name is None:
