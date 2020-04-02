@@ -4,3 +4,4 @@ config.py
 env/
 **~
 logfile.log
+**ipynb**

@@ -63,7 +63,8 @@ class Rapidapi(Source):
         data = data.reset_index(drop=True)
         data['number'] = list(range(len(data)))
         if len(self._new_countries(data)) > 0:
-            logging.info(f'New countries: {str(self._new_countries(data))}')
+            logging.warning(
+                f' New countries: {str(self._new_countries(data))}')
         return data
 
     def _unwrap_column(self, data, colname):
