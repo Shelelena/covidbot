@@ -1,156 +1,130 @@
 import logging
-import time
-from datetime import datetime
-import requests
 from .patterns import Patterns
 from .keyboard import PaginationKeyboard
 
 
 class Communicator:
-    def __init__(self, bot, aggregator):
-        self.bot = bot
+    def __init__(self, aggregator):
         self.aggregator = aggregator
         self.patterns = Patterns()
         self.keyboard = PaginationKeyboard()
-        self._rating_countries_on_page = 20
+        self._max_countries_on_rating_page = 20
 
-    def run_bot(self):
-        while True:
+    def catch_uncatched(coroutine):
+        async def wrapped(self, *args, **kwargs):
             try:
-                self.bot.polling(none_stop=True, timeout=60)
-            except requests.exceptions.Timeout:
-                logging.error(
-                    ' top level exception: requests Timeout; '
-                    f'{str(datetime.now())}'
-                )
-            except Exception:
-                logging.exception(
-                    ' top level exception; '
-                    f'{str(datetime.now())}'
-                )
-            finally:
-                self.bot.stop_polling()
-                time.sleep(15)
+                return await coroutine(self, *args, **kwargs)
 
-    def catch_uncatched(function):
-        def wrapped(self, chat_id, *args, **kwargs):
-            try:
-                attempts = 5
-                for attempt in range(1, attempts+1):
-                    try:
-                        return function(self, chat_id, *args, **kwargs)
-                    except requests.exceptions.ConnectionError:
-                        logging.error(
-                            f' uncatched catched: requests ConnectionError; '
-                            f'chat_id: {chat_id}; try: {attempt}; '
-                            f'{str(datetime.now())}'
-                        )
-                        if attempt == attempts:
-                            logging.exception()
             except Exception:
+                message = self._find_message(*args, **kwargs)
                 logging.exception(
-                    f'uncatched catched: {str(datetime.now())}; '
-                    f'chat: {chat_id}'
-                )
-                self._send_error_message(
-                    chat_id, {'error': 'Случилась какая-то ошибка. Извините.'})
+                    f'uncatched catched; chat: {message.chat.id}')
+                return await self._try_to_send_error_report(message)
+
         return wrapped
 
     @catch_uncatched
-    def send_greeting(self, chat_id):
-        self.bot.send_message(
-            chat_id,
-            self.patterns.greeting()
-        )
+    async def send_greeting(self, message):
+        return await message.answer(self.patterns.greeting())
 
     @catch_uncatched
-    def send_help(self, chat_id):
-        self.bot.send_message(
-            chat_id,
+    async def send_help(self, message):
+        return await message.answer(
             self.patterns.help(),
             disable_web_page_preview=True
         )
 
     @catch_uncatched
-    def send_country(self, chat_id, country):
+    async def send_country(self, message, country):
         info = self.aggregator.get(country)
         if 'error' in info:
-            self._send_error_message(chat_id, info)
+            return await self._send_error_message(message, info)
         elif info['key'] == 'all':
             rating = self.aggregator.rating(1, 5)
-            self._send_world_message(chat_id, info, rating)
+            return await self._send_world_message(message, info, rating)
         else:
-            self._send_country_message(chat_id, info)
+            return await self._send_country_message(message, info)
 
     @catch_uncatched
-    def send_rating(self, chat_id):
+    async def send_rating(self, message):
         world = self.aggregator.get('all')
-        rating = self.aggregator.rating(1, self._rating_countries_on_page)
+        rating = self.aggregator.rating(1, self._max_countries_on_rating_page)
         keyboard = self.keyboard.create()
 
-        self._send_rating_message(chat_id, rating, world, keyboard)
+        return await self._send_rating_message(
+            message, rating, world, keyboard)
 
     @catch_uncatched
-    def turn_rating_page(self, chat_id, message_id, call_id, page_id=1):
-        if page_id == self.keyboard.current_page_id:
-            self._send_no_changes(call_id)
-            return
+    async def turn_rating_page(self, query, page='1'):
+        if page == self.keyboard.current_page_name:
+            return await self._send_no_changes(query)
+        page = int(page)
 
         world = self.aggregator.get('all')
         rating = self.aggregator.rating(
-            *self._countries_on_page(page_id))
-        keyboard = self.keyboard.create(page_id)
+            *self._countries_on_page(page))
+        keyboard = self.keyboard.create(page)
 
-        self._edit_rating_message(
-            chat_id, message_id,
+        return await self._edit_rating_message(
+            query.message,
             rating, world, keyboard
         )
 
-    def _send_country_message(self, chat_id, info):
-        self.bot.send_message(
-            chat_id,
+    async def _send_country_message(self, message, info):
+        return await message.answer(
             self.patterns.country(info),
             parse_mode="Markdown"
         )
 
-    def _send_world_message(self, chat_id, info, rating):
-        self.bot.send_message(
-            chat_id,
+    async def _send_world_message(self, message, info, rating):
+        return await message.answer(
             self.patterns.world(info, rating),
             parse_mode="Markdown"
         )
 
-    def _send_error_message(self, chat_id, info):
-        self.bot.send_message(
-            chat_id,
-            self.patterns.error(info)
-        )
+    async def _send_error_message(self, message, info):
+        return await message.answer(self.patterns.error(info))
 
-    def _send_no_changes(self, call_id):
-        self.bot.answer_callback_query(callback_query_id=call_id)
+    async def _send_no_changes(self, query):
+        return await query.answer()
 
-    def _send_rating_message(self, chat_id, rating, world, keyboard):
-        self.bot.send_message(
-            chat_id,
+    async def _send_rating_message(self, message, rating, world, keyboard):
+        return await message.answer(
             self.patterns.rating(rating, world),
             parse_mode="Markdown",
             reply_markup=keyboard
         )
 
-    def _edit_rating_message(
-        self, chat_id, message_id, rating, world, keyboard
-    ):
-        self.bot.edit_message_text(
-            chat_id=chat_id,
-            message_id=message_id,
+    async def _edit_rating_message(self, message, rating, world, keyboard):
+        return await message.edit_text(
             text=self.patterns.rating(rating, world),
             parse_mode='Markdown',
             reply_markup=keyboard
         )
 
-    def _countries_on_page(self, page_id):
-        page_number = self.keyboard.extract_current_page(page_id)
+    def _countries_on_page(self, page):
         return (
-            (page_number-1) * self._rating_countries_on_page + 1,
-            page_number * self._rating_countries_on_page
+            (page-1) * self._max_countries_on_rating_page + 1,
+            page * self._max_countries_on_rating_page
         )
+
+    def _find_message(self, *args, **kwargs):
+        if 'message' in kwargs:
+            message = kwargs['message']
+        elif 'query' in kwargs:
+            message = kwargs['query'].message
+        else:
+            message = args[0]
+            if hasattr(message, 'message'):
+                message = message.message
+        return message
+
+    async def _try_to_send_error_report(self, message):
+        try:
+            return await self._send_error_message(
+                message,
+                {'error': 'Извините, Случилась какая-то ошибка.'}
+            )
+        except Exception:
+            logging.error(
+                f'error report failed; chat_id: {message.chat.id}')

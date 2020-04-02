@@ -1,62 +1,45 @@
-import re
 from .logger import log
 
 
-def register_handlers(communicator):
-    bot = communicator.bot
+def register_handlers(communicator, dispatcher):
+    dp = dispatcher
 
-    @bot.message_handler(commands=['start'])
+    @dp.message_handler(commands=['start', 'help', 'all', 'rating'])
     @log
-    def greeting(message):
-        communicator.send_greeting(
-            message.chat.id
+    async def handle_commands(message, command):
+        if command.command == 'start':
+            await communicator.send_greeting(message)
+
+        elif command.command == 'help':
+            await communicator.send_help(message)
+
+        elif command.command == 'all':
+            await communicator.send_country(message, 'all')
+
+        elif command.command == 'rating':
+            await communicator.send_rating(message)
+
+    @dp.message_handler(regexp=communicator.patterns.country_command)
+    @log
+    async def handle_country_links(message, regexp):
+        country = regexp.group(1)
+        await communicator.send_country(
+            message,
+            country
         )
 
-    @bot.message_handler(commands=['help'])
+    @dp.message_handler(content_types=['text'])
     @log
-    def help(message):
-        communicator.send_help(
-            message.chat.id
-        )
-
-    @bot.message_handler(commands=['all'])
-    @log
-    def world(message):
-        communicator.send_country(
-            message.chat.id, 'all'
-        )
-
-    @bot.message_handler(commands=['rating'])
-    @log
-    def rating(message):
-        communicator.send_rating(
-            message.chat.id
-        )
-
-    @bot.callback_query_handler(func=lambda call: True)
-    @log
-    def turn_rating_page(call):
-        communicator.turn_rating_page(
-            call_id=call.id,
-            chat_id=call.message.chat.id,
-            message_id=call.message.message_id,
-            page_id=call.data
-        )
-
-    @bot.message_handler(regexp=communicator.patterns.country_command)
-    @log
-    def country_link(message):
-        pattern = communicator.patterns.country_command
-        country = re.search(pattern, message.text).group(1)
-        communicator.send_country(
-            message.chat.id,
-            country=country
-        )
-
-    @bot.message_handler(content_types=['text'])
-    @log
-    def country_statistics(message):
-        communicator.send_country(
-            message.chat.id,
+    async def handle_country_names(message):
+        await communicator.send_country(
+            message,
             country=message.text
+        )
+
+    @dp.callback_query_handler(communicator.keyboard.callback.filter())
+    @log
+    async def turn_rating_page(query, callback_data):
+        await communicator.turn_rating_page(
+            query=query,
+            page=callback_data['page']
         )

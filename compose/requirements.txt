@@ -1,5 +1,6 @@
 ipython
+aiogram
 requests
+httpx
 pandas
 pytest
-pytelegrambotapi

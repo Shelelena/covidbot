@@ -1,5 +1,6 @@
-import telebot
+import aiogram
 import logging
+import time
 
 from communicator import register_handlers, Communicator
 from aggregator import Aggregator
@@ -7,14 +8,26 @@ from config import BOT_TOKEN, RAPIDAPI_KEY, LOG_FILE
 
 
 def main():
-    logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S',
+        filename=LOG_FILE,
+    )
 
-    bot = telebot.TeleBot(BOT_TOKEN)
+    bot = aiogram.Bot(BOT_TOKEN)
+    dispatcher = aiogram.Dispatcher(bot)
+
     aggregator = Aggregator(rapidapi_key=RAPIDAPI_KEY)
-    communicator = Communicator(bot, aggregator)
-    register_handlers(communicator)
+    communicator = Communicator(aggregator)
+    register_handlers(communicator, dispatcher)
 
-    communicator.run_bot()
+    while True:
+        try:
+            aiogram.executor.start_polling(dispatcher)
+        except Exception:
+            logging.exception('top level exception')
+            time.sleep(15)
 
 
 if __name__ == '__main__':

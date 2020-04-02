@@ -1,30 +1,21 @@
-from telebot import types
-import re
+from aiogram import types
+from aiogram.utils.callback_data import CallbackData
 
 
 class PaginationKeyboard:
     def __init__(self, total_number_of_pages=11):
+        self.callback = CallbackData('rating_page', 'page')
         self._last_page = total_number_of_pages
-        self._page_id_start = 'rating_page_'
-        self.current_page_id = 'current_rating_page'
+        self._page_id_prefix = 'rating_page:'
+        self.current_page_name = 'current'
 
-    def create(self, current_page_id='rating_page_1'):
-        current_page = self.extract_current_page(current_page_id)
-
+    def create(self, current_page=1):
         page_numbers = self._page_numbers(current_page)
         page_images = self._page_images(current_page, page_numbers)
-        page_id_s = self._page_id_s(current_page, page_numbers)
+        page_numbers = self._mark_current(current_page, page_numbers)
 
-        keyboard = self._keyboard(page_images, page_id_s)
+        keyboard = self._keyboard(page_images, page_numbers)
         return keyboard
-
-    def extract_current_page(self, current_page_id):
-        pattern = '^' + self._page_id_start + r'(\d+)$'
-        match = re.match(pattern, current_page_id)
-        assert match
-        current_page = int(match.group(1))
-        assert 1 <= current_page <= self._last_page
-        return current_page
 
     def _page_numbers(self, current_page):
         if current_page < 4:
@@ -57,15 +48,18 @@ class PaginationKeyboard:
             '- ' + page_images[page_numbers.index(current_page)] + ' -')
         return page_images
 
-    def _page_id_s(self, current_page, page_numbers):
-        page_id_s = [self._page_id_start + str(num) for num in page_numbers]
-        page_id_s[page_numbers.index(current_page)] = self.current_page_id
-        return page_id_s
+    def _mark_current(self, current_page, page_numbers):
+        page_numbers = page_numbers.copy()
+        page_numbers[page_numbers.index(current_page)] = self.current_page_name
+        return page_numbers
 
-    def _keyboard(self, page_images, page_id_s):
+    def _keyboard(self, page_images, page_numbers):
         buttons = [
-            types.InlineKeyboardButton(text=image, callback_data=id)
-            for image, id in zip(page_images, page_id_s)
+            types.InlineKeyboardButton(
+                text=image,
+                callback_data=self.callback.new(page=number)
+            )
+            for image, number in zip(page_images, page_numbers)
         ]
         keyboard = types.InlineKeyboardMarkup()
         keyboard.row(*buttons)

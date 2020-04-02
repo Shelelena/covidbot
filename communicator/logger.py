@@ -1,27 +1,35 @@
 import logging
-from datetime import datetime
 
 
-def log(function):
+def log(coroutine):
     exceptions = [206980992]
 
-    def wrapped(query):
+    async def wrapped(query, *args, **kwargs):
+        del(kwargs['state'])
+        del(kwargs['raw_state'])
+
+        text = None
+        message = None
         if hasattr(query, 'text'):
             text = query.text
-            chat_id = query.chat.id
+            message = query
         elif hasattr(query, 'message'):
             text = query.data
-            chat_id = query.message.chat.id
+            message = query.message
 
-        if chat_id in exceptions:
-            return function(query)
+        if message.chat.id not in exceptions:
 
-        if text == '/start':
-            logging.info(' !new greeting!')
-        logging.info(
-            f' query: {text}, '
-            f'chat_id: {chat_id}, '
-            f'{str(datetime.now())}'
-        )
-        return function(query)
+            if text is None and message is None:
+                logging.warning(f'Very strange query: {str(query)}')
+
+            else:
+                if text == '/start':
+                    logging.info('!new greeting!')
+                logging.info(
+                    f'chat_id: {message.chat.id}, '
+                    f'query: {str(text)}, '
+                    f'first_name: {str(query["from"].first_name)}, '
+                    f'username: {str(query["from"].username)}, '
+                )
+        return await coroutine(query, *args, **kwargs)
     return wrapped
