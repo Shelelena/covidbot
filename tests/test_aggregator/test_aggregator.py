@@ -1,14 +1,21 @@
+import pytest
 from unittest.mock import patch, MagicMock
 
 from aggregator import Aggregator
-from aggregator.sources import Rapidapi
+from aggregator.rapidapisource import RapidapiSource
 from .mocks import mock_load
 
 
-@patch.object(Rapidapi, '_load', mock_load)
-def test_aggregator_case():
+@pytest.fixture
+@patch.object(RapidapiSource, 'load_data', mock_load)
+def aggr():
     aggr = Aggregator()
-    data = aggr.get('France')
+    aggr.load_sources()
+    return aggr
+
+
+def test_aggregator_case(aggr):
+    data = aggr.country('France')
     assert data == {
         'key': 'france',
         'country': 'Франция',
@@ -25,36 +32,29 @@ def test_aggregator_case():
     }
 
 
-@patch.object(Rapidapi, 'is_expired', MagicMock())
-@patch.object(Rapidapi, 'load', MagicMock())
-@patch.object(Rapidapi, 'get_info', MagicMock())
-def test_aggregator_calls():
-    aggr = Aggregator()
-
+@patch.object(RapidapiSource, 'is_expired', MagicMock())
+@patch.object(RapidapiSource, 'update', MagicMock())
+@patch.object(RapidapiSource, 'single_country', MagicMock())
+def test_aggregator_calls(aggr):
     aggr._rapidapi.is_expired.return_value = False
-    aggr.get('Germany')
-    aggr.get('USA')
+    aggr.country('Germany')
+    aggr.country('USA')
 
     aggr._rapidapi.is_expired.return_value = True
-    aggr.get('Italy')
+    aggr.country('Italy')
 
     assert aggr._rapidapi.is_expired.call_count == 3
-    assert aggr._rapidapi.load.call_count == 2
-    assert aggr._rapidapi.get_info.call_count == 3
+    assert aggr._rapidapi.update.call_count == 1
+    assert aggr._rapidapi.single_country.call_count == 3
 
 
-@patch.object(Rapidapi, '_load', mock_load)
-def test_wrong_country():
-    aggr = Aggregator()
-    result = aggr.get('Oz')
+def test_wrong_country(aggr):
+    result = aggr.country('Oz')
     assert len(result) == 1
     assert 'error' in result
 
 
-@patch.object(Rapidapi, '_load', mock_load)
-def test_aggergator_rating():
-    aggr = Aggregator()
-
+def test_aggergator_rating(aggr):
     rating = aggr.rating(1, 5)
     assert len(rating) == 5
     countries = [i['country'] for i in rating]

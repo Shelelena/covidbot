@@ -36,7 +36,7 @@ class Communicator:
 
     @catch_uncatched
     async def send_country(self, message, country):
-        info = self.aggregator.get(country)
+        info = self.aggregator.country(country)
         if 'error' in info:
             return await self._send_error_message(message, info)
         elif info['key'] == 'all':
@@ -47,7 +47,7 @@ class Communicator:
 
     @catch_uncatched
     async def send_rating(self, message):
-        world = self.aggregator.get('all')
+        world = self.aggregator.country('all')
         rating = self.aggregator.rating(1, self._max_countries_on_rating_page)
         keyboard = self.keyboard.create()
 
@@ -60,7 +60,7 @@ class Communicator:
             return await self._send_no_changes(query)
         page = int(page)
 
-        world = self.aggregator.get('all')
+        world = self.aggregator.country('all')
         rating = self.aggregator.rating(
             *self._countries_on_page(page))
         keyboard = self.keyboard.create(page)

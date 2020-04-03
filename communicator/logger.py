@@ -17,19 +17,17 @@ def log(coroutine):
             text = query.data
             message = query.message
 
-        if message.chat.id not in exceptions:
+        if text is None and message is None:
+            logging.warning(f'Very strange query: {str(query)}')
 
-            if text is None and message is None:
-                logging.warning(f'Very strange query: {str(query)}')
-
-            else:
-                if text == '/start':
-                    logging.info('!new greeting!')
-                logging.info(
-                    f'chat_id: {message.chat.id}, '
-                    f'query: {str(text)}, '
-                    f'first_name: {str(query["from"].first_name)}, '
-                    f'username: {str(query["from"].username)}, '
-                )
+        elif message.chat.id not in exceptions:
+            if text == '/start':
+                logging.info('!new greeting!')
+            logging.info(
+                f'chat_id: {message.chat.id}, '
+                f'query: {str(text)}, '
+                f'first_name: {str(query["from"].first_name)}, '
+                f'username: {str(query["from"].username)}, '
+            )
         return await coroutine(query, *args, **kwargs)
     return wrapped

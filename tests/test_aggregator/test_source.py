@@ -21,12 +21,12 @@ def test_abstract_methods_not_inherited():
 
 class MinimalHeir(Source):
     def __init__(self):
-        self._expire_time = timedelta(seconds=30)
+        self.expire_time = timedelta(seconds=30)
 
-    def _load(self):
+    def load_data(self):
         return 'data'
 
-    def _prepare_data(self, data):
+    def prepare_data(self, data):
         return data
 
 
@@ -37,21 +37,21 @@ def test_minimal_heir():
 
 def test_is_expired():
     heir = MinimalHeir()
-    heir._last_updated = datetime.now() - timedelta(minutes=1)
+    heir.last_updated = datetime.now() - timedelta(minutes=1)
     assert heir.is_expired()
 
 
 def test_is_not_expired():
     heir = MinimalHeir()
-    heir._last_updated = datetime.now() - timedelta(seconds=10)
+    heir.last_updated = datetime.now() - timedelta(seconds=10)
     assert not heir.is_expired()
 
 
-@patch.object(MinimalHeir, '_load', Mock())
-@patch.object(MinimalHeir, '_prepare_data', Mock())
-def test_load():
+@patch.object(MinimalHeir, 'load_data', Mock())
+@patch.object(MinimalHeir, 'prepare_data', Mock())
+def test_update():
     heir = MinimalHeir()
-    heir.load()
-    heir._load.assert_called_once()
-    heir._prepare_data.assert_called_once()
-    assert datetime.now() - heir._last_updated < timedelta(seconds=3)
+    heir.update()
+    heir.load_data.assert_called_once()
+    heir.prepare_data.assert_called_once()
+    assert datetime.now() - heir.last_updated < timedelta(seconds=3)

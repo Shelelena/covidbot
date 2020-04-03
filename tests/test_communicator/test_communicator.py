@@ -36,34 +36,34 @@ async def test_country(comm):
     message = AsyncMock()
     await comm.send_country(message, 'country_1')
 
-    comm.aggregator.get.assert_called_once_with('country_1')
+    comm.aggregator.country.assert_called_once_with('country_1')
     comm.patterns.country.assert_called_once_with(
-        comm.aggregator.get())
+        comm.aggregator.country())
     message.answer.assert_called_once_with(
         comm.patterns.country(), parse_mode="Markdown")
 
 
 @pytest.mark.asyncio
 async def test_world(comm):
-    comm.aggregator.get.return_value = {'key': 'all'}
+    comm.aggregator.country.return_value = {'key': 'all'}
     message = AsyncMock()
     await comm.send_country(message, 'country_3')
 
     comm.aggregator.rating.assert_called_once_with(1, 5)
     comm.patterns.world.assert_called_once_with(
-        comm.aggregator.get(), comm.aggregator.rating())
+        comm.aggregator.country(), comm.aggregator.rating())
     message.answer.assert_called_once_with(
         comm.patterns.world(), parse_mode="Markdown")
 
 
 @pytest.mark.asyncio
 async def test_country_statistics_with_error(comm):
-    comm.aggregator.get.return_value = {'error': 'error_msg'}
+    comm.aggregator.country.return_value = {'error': 'error_msg'}
     message = AsyncMock()
     await comm.send_country(message, 'country_2')
 
     comm.patterns.error.assert_called_once_with(
-        comm.aggregator.get())
+        comm.aggregator.country())
     message.answer.assert_called_once_with(comm.patterns.error())
 
 
@@ -72,10 +72,10 @@ async def test_rating_message(comm):
     message = AsyncMock()
     await comm.send_rating(message)
 
-    comm.aggregator.get.assert_called_once_with('all')
+    comm.aggregator.country.assert_called_once_with('all')
     comm.aggregator.rating.assert_called_once_with(1, 20)
     comm.patterns.rating.assert_called_once_with(
-        comm.aggregator.rating(), comm.aggregator.get())
+        comm.aggregator.rating(), comm.aggregator.country())
     comm.keyboard.create.assert_called_once_with()
     message.answer.assert_called_once_with(
         comm.patterns.rating(),
@@ -89,10 +89,10 @@ async def test_rating_turn_page(comm):
     query = AsyncMock()
     await comm.turn_rating_page(query, page='3')
 
-    comm.aggregator.get.assert_called_once_with('all')
+    comm.aggregator.country.assert_called_once_with('all')
     comm.aggregator.rating.assert_called_once_with(41, 60)
     comm.patterns.rating.assert_called_once_with(
-        comm.aggregator.rating(), comm.aggregator.get())
+        comm.aggregator.rating(), comm.aggregator.country())
     comm.keyboard.create.assert_called_once_with(3)
     query.message.edit_text.assert_called_once_with(
         text=comm.patterns.rating(),

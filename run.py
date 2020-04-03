@@ -14,6 +14,8 @@ def main():
     dispatcher = aiogram.Dispatcher(bot)
 
     aggregator = Aggregator(rapidapi_key=RAPIDAPI_KEY)
+    aggregator.load_sources()
+
     communicator = Communicator(aggregator)
     register_handlers(communicator, dispatcher)
 

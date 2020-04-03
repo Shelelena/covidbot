@@ -3,14 +3,16 @@ from unittest.mock import patch
 
 from communicator.patterns import Patterns
 from aggregator import Aggregator
-from aggregator.sources import Rapidapi
+from aggregator.rapidapisource import RapidapiSource
 from ..test_aggregator.mocks import mock_load
 
 
 @fixture
-@patch.object(Rapidapi, '_load', mock_load)
+@patch.object(RapidapiSource, 'load_data', mock_load)
 def aggr():
-    return Aggregator()
+    aggr = Aggregator()
+    aggr.load_sources()
+    return aggr
 
 
 def test_greeting_pattern():
@@ -66,7 +68,7 @@ def test_country_pattern():
 
 
 def test_country_pattern_on_aggregator(aggr):
-    info = aggr.get('франция')
+    info = aggr.country('франция')
     country = Patterns().country(info)
     assert country == (
         '*Франция*\n\n'
@@ -81,7 +83,7 @@ def test_country_pattern_on_aggregator(aggr):
 
 
 def test_world_pattern_on_aggregator(aggr):
-    info = aggr.get('all')
+    info = aggr.country('all')
     rating = aggr.rating(1, 3)
     world = Patterns().world(info, rating)
     assert world == (
@@ -102,7 +104,7 @@ def test_world_pattern_on_aggregator(aggr):
 
 def test_rating_pattern_on_aggregator(aggr):
     rating = aggr.rating(1, 3)
-    world = aggr.get()
+    world = aggr.country()
     result = Patterns().rating(rating, world)
     assert result == (
         '*723319 Мир*    -> /all\n\n'
