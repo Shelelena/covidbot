@@ -1,4 +1,4 @@
-import requests
+import httpx
 import json
 from datetime import timedelta
 import pandas as pd
@@ -35,18 +35,18 @@ class RapidapiSource(Source):
         range_data = range_data.to_dict(orient='records')
         return range_data
 
-    def load_data(self):
+    async def load_data(self):
         if self._key is None:
             raise NoRapidapiKey
 
-        response = requests.request(
-            "GET",
-            "https://covid-193.p.rapidapi.com/statistics",
-            headers={
-                'x-rapidapi-host': "covid-193.p.rapidapi.com",
-                'x-rapidapi-key': self._key,
-            }
-        )
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://covid-193.p.rapidapi.com/statistics",
+                headers={
+                    'x-rapidapi-host': "covid-193.p.rapidapi.com",
+                    'x-rapidapi-key': self._key,
+                }
+            )
         return response.text
 
     def prepare_data(self, data: str) -> pd.DataFrame:

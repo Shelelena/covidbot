@@ -1,3 +1,4 @@
+import asyncio
 import aiogram
 import logging
 import time
@@ -14,7 +15,8 @@ def main():
     dispatcher = aiogram.Dispatcher(bot)
 
     aggregator = Aggregator(rapidapi_key=RAPIDAPI_KEY)
-    aggregator.load_sources()
+    asyncio.run(aggregator.load_sources())
+    dispatcher.loop.create_task(aggregator.update())
 
     communicator = Communicator(aggregator)
     register_handlers(communicator, dispatcher)

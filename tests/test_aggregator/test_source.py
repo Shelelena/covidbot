@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, AsyncMock
 from datetime import datetime, timedelta
 
 from aggregator.sources import Source
@@ -23,7 +23,7 @@ class MinimalHeir(Source):
     def __init__(self):
         self.expire_time = timedelta(seconds=30)
 
-    def load_data(self):
+    async def load_data(self):
         return 'data'
 
     def prepare_data(self, data):
@@ -47,11 +47,12 @@ def test_is_not_expired():
     assert not heir.is_expired()
 
 
-@patch.object(MinimalHeir, 'load_data', Mock())
+@pytest.mark.asyncio
+@patch.object(MinimalHeir, 'load_data', AsyncMock())
 @patch.object(MinimalHeir, 'prepare_data', Mock())
-def test_update():
+async def test_update():
     heir = MinimalHeir()
-    heir.update()
+    await heir.update()
     heir.load_data.assert_called_once()
     heir.prepare_data.assert_called_once()
     assert datetime.now() - heir.last_updated < timedelta(seconds=3)

@@ -30,11 +30,14 @@ def register_handlers(communicator, dispatcher):
 
     @dp.message_handler(content_types=['text'])
     @log
-    async def handle_country_names(message):
-        await communicator.send_country(
-            message,
-            country=message.text
-        )
+    async def handle_messages(message):
+        if message.text.lower() in ('rating', 'рейтинг'):
+            await communicator.send_rating(message)
+        else:
+            await communicator.send_country(
+                message,
+                country=message.text
+            )
 
     @dp.callback_query_handler(communicator.keyboard.callback.filter())
     @log

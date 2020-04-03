@@ -12,7 +12,8 @@ class Patterns:
         return (
             'Привет, я помогаю отслеживать обстановку '
             'по COVID-19.\n\n'
-            'Чтобы получить текущую информацию, введите название страны.\n'
+            'Чтобы получить текущую информацию, введите название страны.\n\n'
+            'Либо нажмите на ссылку:'
             + self._go_to_all()
             + self._go_to_rating()
             + self._go_to_help()
@@ -36,6 +37,7 @@ class Patterns:
         return (
             self._country(info)
             + '\n' + self._reload(info)
+            + self._go_to_all()
             + self._go_to_rating()
         )
 

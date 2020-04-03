@@ -1,4 +1,4 @@
-from pytest import fixture
+import pytest
 from unittest.mock import patch
 
 from communicator.patterns import Patterns
@@ -7,11 +7,11 @@ from aggregator.rapidapisource import RapidapiSource
 from ..test_aggregator.mocks import mock_load
 
 
-@fixture
+@pytest.fixture
 @patch.object(RapidapiSource, 'load_data', mock_load)
-def aggr():
+async def aggr():
     aggr = Aggregator()
-    aggr.load_sources()
+    await aggr.load_sources()
     return aggr
 
 
@@ -63,6 +63,7 @@ def test_country_pattern():
         'Погибших за сегодня:\n`+299`\n'
         'Выздоровевшие:\n`5700`\n\n'
         '/c\\_france - обновить данные\n'
+        '/all - статистика по миру\n'
         '/rating - рейтинг стран'
     )
 
@@ -78,6 +79,7 @@ def test_country_pattern_on_aggregator(aggr):
         'Погибших за сегодня:\n`+299`\n'
         'Выздоровевшие:\n`5700`\n\n'
         '/c\\_france - обновить данные\n'
+        '/all - статистика по миру\n'
         '/rating - рейтинг стран'
     )
 

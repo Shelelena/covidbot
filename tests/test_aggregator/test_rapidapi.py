@@ -10,14 +10,15 @@ from .mocks import mock_load
 
 @pytest.fixture
 @patch.object(RapidapiSource, 'load_data', mock_load)
-def rapidapi():
+async def rapidapi():
     rapidapi = RapidapiSource()
-    rapidapi.update()
+    await rapidapi.update()
     return rapidapi
 
 
-def test_unwrap_column():
-    data = mock_load()
+@pytest.mark.asyncio
+async def test_unwrap_column():
+    data = await mock_load()
     data = json.loads(data)
     data = data['response']
     data = pd.DataFrame(data)
@@ -34,9 +35,10 @@ def test_unwrap_column():
     assert len(data.columns) == 9
 
 
-def test_prepare_data():
+@pytest.mark.asyncio
+async def test_prepare_data():
     rapidapi = RapidapiSource()
-    data = mock_load()
+    data = await mock_load()
     data = rapidapi.prepare_data(data)
 
     assert type(data) is pd.DataFrame

@@ -4,14 +4,14 @@ import logging
 
 
 class Source(ABC):
-    def update(self):
-        data = self.load_data()
+    async def update(self):
+        data = await self.load_data()
         self.data = self.prepare_data(data)
         self.last_updated = datetime.now()
         logging.info(f'Source updated: {type(self).__name__}')
 
     @abstractmethod
-    def load_data(self):
+    async def load_data(self):
         pass
 
     @abstractmethod

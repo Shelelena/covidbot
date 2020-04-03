@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
@@ -8,9 +8,9 @@ from .mocks import mock_load
 
 @pytest.fixture
 @patch.object(RapidapiSource, 'load_data', mock_load)
-def aggr():
+async def aggr():
     aggr = Aggregator()
-    aggr.load_sources()
+    await aggr.load_sources()
     return aggr
 
 
@@ -30,22 +30,6 @@ def test_aggregator_case(aggr):
         'total_deaths': 1995,
         'number': 7,
     }
-
-
-@patch.object(RapidapiSource, 'is_expired', MagicMock())
-@patch.object(RapidapiSource, 'update', MagicMock())
-@patch.object(RapidapiSource, 'single_country', MagicMock())
-def test_aggregator_calls(aggr):
-    aggr._rapidapi.is_expired.return_value = False
-    aggr.country('Germany')
-    aggr.country('USA')
-
-    aggr._rapidapi.is_expired.return_value = True
-    aggr.country('Italy')
-
-    assert aggr._rapidapi.is_expired.call_count == 3
-    assert aggr._rapidapi.update.call_count == 1
-    assert aggr._rapidapi.single_country.call_count == 3
 
 
 def test_wrong_country(aggr):

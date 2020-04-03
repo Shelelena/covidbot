@@ -1,4 +1,4 @@
-def mock_load(self=None):
+async def mock_load(self=None):
     return ('{"get":"statistics","parameters":[],"errors":[],'
             '"results":206,"response":'
             '[{"country":"China","cases":{"new":"+54","active":3128,'
