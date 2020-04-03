@@ -8,12 +8,7 @@ from config import BOT_TOKEN, RAPIDAPI_KEY, LOG_FILE
 
 
 def main():
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
-        level=logging.INFO,
-        datefmt='%Y-%m-%d %H:%M:%S',
-        filename=LOG_FILE,
-    )
+    set_logging()
 
     bot = aiogram.Bot(BOT_TOKEN)
     dispatcher = aiogram.Dispatcher(bot)
@@ -22,6 +17,19 @@ def main():
     communicator = Communicator(aggregator)
     register_handlers(communicator, dispatcher)
 
+    run(dispatcher)
+
+
+def set_logging():
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S',
+        filename=LOG_FILE,
+    )
+
+
+def run(dispatcher):
     while True:
         try:
             aiogram.executor.start_polling(dispatcher)
