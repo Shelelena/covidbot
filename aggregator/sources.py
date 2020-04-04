@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+import pandas as pd
 import logging
 
 
@@ -11,11 +12,11 @@ class Source(ABC):
         logging.info(f'Source updated: {type(self).__name__}')
 
     @abstractmethod
-    async def load_data(self):
+    async def load_data(self) -> str:
         pass
 
     @abstractmethod
-    def prepare_data(self):
+    def prepare_data(self, data: str) -> pd.DataFrame:
         pass
 
     def is_expired(self):

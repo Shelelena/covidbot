@@ -28,6 +28,8 @@ def log(coroutine):
                 f'query: {str(text)}, '
                 f'first_name: {str(query["from"].first_name)}, '
                 f'username: {str(query["from"].username)}, '
+                f'is_bot: {str(query["from"].is_bot)}, '
             )
+
         return await coroutine(query, *args, **kwargs)
     return wrapped

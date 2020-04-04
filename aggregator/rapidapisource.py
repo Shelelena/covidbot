@@ -81,6 +81,7 @@ class RapidapiSource(Source):
     def _set_country_keys_and_names(self, data):
         data['key'] = data.country.str.lower()
         data.key = data.key.str.replace(r'[\.\-\&\;]', '')
+        data.key = data.key.map(self._dictionary.name_to_key())
         data = data.drop_duplicates(subset=['key'])
         data.country = data.key.map(self._dictionary.key_to_name())
         return data

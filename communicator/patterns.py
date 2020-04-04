@@ -6,15 +6,16 @@ class Patterns:
     def _link(self, info):
         if info['key'] == 'all':
             return '/all'
-        return '/c\\_' + info['key']
+        return '/c\\_' + str(info['key'])
 
     def greeting(self):
         return (
             'Привет, я помогаю отслеживать обстановку '
             'по COVID-19.\n\n'
             'Чтобы получить текущую информацию, введите название страны.\n\n'
-            'Либо нажмите на ссылку:'
+            'Либо можно нажимать на ссылки:\n'
             + self._go_to_all()
+            + self._go_to_russia()
             + self._go_to_rating()
             + self._go_to_help()
         )
@@ -23,7 +24,7 @@ class Patterns:
         return (
             '/all - статистика по миру\n'
             '/rating - рейтинг стран по заболеваемости\n'
-            '/c_russia - статистика по россии\n'
+            '/c_russia - статистика по России\n'
             '/help - эта справка\n\n'
             'Чтобы получить текущую информацию по любой стране, введите '
             'название страны. Для получения информации по миру, введите '
@@ -116,6 +117,9 @@ class Patterns:
 
     def _go_to_all(self):
         return '\n/all - статистика по миру'
+
+    def _go_to_russia(self):
+        return '\n/c_russia - статистика по России'
 
     def _go_to_help(self):
         return '\n/help - справка'
