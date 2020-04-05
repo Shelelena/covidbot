@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.utils.callback_data import CallbackData
 
 
-class PaginationKeyboard:
+class RatingPaginationKeyboard:
     def __init__(self, total_number_of_pages=11):
         self.callback = CallbackData('rating_page', 'page')
         self._last_page = total_number_of_pages

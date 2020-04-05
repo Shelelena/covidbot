@@ -36,13 +36,13 @@ class Patterns:
 
     def country(self, info):
         return (
-            self._country(info)
+            self._country_details(info)
             + '\n' + self._reload(info)
             + self._go_to_all()
             + self._go_to_rating()
         )
 
-    def _country(self, info):
+    def _country_details(self, info):
         return (
             f"*{info['country']}*\n\n"
             + self._detailed([
@@ -56,7 +56,7 @@ class Patterns:
 
     def world(self, info, rating):
         return (
-            self._country(info)
+            self._country_details(info)
             + '\n\n*Топ 5 стран*\n\n'
             + self.rating(rating)
             + '\n' + self._reload(info)

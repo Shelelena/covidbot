@@ -2,7 +2,7 @@ import json
 import os
 
 
-class Dictionary:
+class CompatibilityDictionary:
     def __init__(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         with open(dir_path + '/keys_to_names.json') as file:
@@ -12,8 +12,8 @@ class Dictionary:
             for key, name in keys_to_names.items()}
         with open(dir_path + '/names_to_keys.json') as file:
             names_to_keys = {**json.load(file), **names_to_keys}
-        self._keys_to_names = DictLeavingMissing(keys_to_names)
-        self._names_to_keys = DictLeavingMissing(names_to_keys)
+        self._keys_to_names = DictLeavingMissings(keys_to_names)
+        self._names_to_keys = DictLeavingMissings(names_to_keys)
 
     def name_to_key(self, name=None):
         if name is None:
@@ -27,6 +27,6 @@ class Dictionary:
         return self._keys_to_names[key]
 
 
-class DictLeavingMissing(dict):
+class DictLeavingMissings(dict):
     def __missing__(self, key):
         return key

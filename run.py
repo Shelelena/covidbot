@@ -16,7 +16,7 @@ def main():
 
     aggregator = Aggregator(rapidapi_key=RAPIDAPI_KEY)
     asyncio.run(aggregator.load_sources())
-    dispatcher.loop.create_task(aggregator.update())
+    dispatcher.loop.create_task(aggregator.update_periodically())
 
     communicator = Communicator(aggregator)
     register_handlers(communicator, dispatcher)

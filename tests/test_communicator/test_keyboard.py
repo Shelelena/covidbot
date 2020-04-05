@@ -1,7 +1,7 @@
 from pytest import mark
 from unittest.mock import patch, Mock, call
 import aiogram
-from communicator.keyboard import PaginationKeyboard
+from communicator.keyboard import RatingPaginationKeyboard
 
 
 test_data = [
@@ -40,7 +40,7 @@ test_data = [
 @patch('aiogram.types.InlineKeyboardMarkup', Mock())
 @patch('aiogram.types.InlineKeyboardButton', Mock())
 def test_create(input, call_args):
-    PaginationKeyboard().create(input)
+    RatingPaginationKeyboard().create(input)
 
     calls = [call(**kwargs) for kwargs in call_args]
 

@@ -1,13 +1,13 @@
 import logging
 from .patterns import Patterns
-from .keyboard import PaginationKeyboard
+from .keyboard import RatingPaginationKeyboard
 
 
 class Communicator:
     def __init__(self, aggregator):
         self.aggregator = aggregator
         self.patterns = Patterns()
-        self.keyboard = PaginationKeyboard()
+        self.keyboard = RatingPaginationKeyboard()
         self._max_countries_on_rating_page = 20
 
     def catch_uncatched(coroutine):

@@ -28,7 +28,7 @@ async def test_unwrap_column():
     assert len(data.columns) == 5
 
     rapidapi = RapidapiSource()
-    data = rapidapi._unwrap_dict_column(data, 'cases')
+    data = rapidapi._unwrap_one_column(data, 'cases')
 
     assert 'cases' not in data
     assert 'total_cases' in data

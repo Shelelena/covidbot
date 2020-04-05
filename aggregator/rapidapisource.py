@@ -6,16 +6,18 @@ import logging
 
 from .sources import Source
 from exceptions import CountryNotFound, NoRapidapiKey
-from .dictionary import Dictionary
+from .dictionary import CompatibilityDictionary
 
 
 class RapidapiSource(Source):
-    def __init__(self, key=None):
+    def __init__(self, key=None, dictionary=None):
         self._key = key
         self.data = None
         self.last_updated = None
         self.expire_time = timedelta(minutes=10)
-        self._dictionary = Dictionary()
+        self._dictionary = dictionary
+        if self._dictionary is None:
+            self._dictionary = CompatibilityDictionary()
 
     def single_country(self, name='all'):
         key = self._dictionary.name_to_key(name)
@@ -65,10 +67,10 @@ class RapidapiSource(Source):
 
     def _unwrap_columns(self, data):
         for colname in ('cases', 'deaths'):
-            data = self._unwrap_dict_column(data, colname)
+            data = self._unwrap_one_column(data, colname)
         return data
 
-    def _unwrap_dict_column(self, data, colname: str):
+    def _unwrap_one_column(self, data, colname: str):
         unwrapped_data = pd.DataFrame(list(data[colname]))
         unwrapped_data.columns = [
             name + '_' + colname
@@ -79,6 +81,7 @@ class RapidapiSource(Source):
         return data
 
     def _set_country_keys_and_names(self, data):
+        data = data.copy()
         data['key'] = data.country.str.lower()
         data.key = data.key.str.replace(r'[\.\-\&\;]', '')
         data.key = data.key.map(self._dictionary.name_to_key())

@@ -2,7 +2,7 @@ import logging
 
 
 def log(coroutine):
-    exceptions = [206980992]
+    exceptions = [206980992]  # без кода непонятно, что это чат айди
 
     async def wrapped(query, *args, **kwargs):
         del(kwargs['state'])

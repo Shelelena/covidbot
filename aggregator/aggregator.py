@@ -1,19 +1,20 @@
 import asyncio
 from .rapidapisource import RapidapiSource
 from exceptions import CountryNotFound
-from .dictionary import Dictionary
+from .dictionary import CompatibilityDictionary
 
 
 class Aggregator:
     def __init__(self, rapidapi_key=None):
-        self._rapidapi = RapidapiSource(rapidapi_key)
+        dictionary = CompatibilityDictionary()
+        self._rapidapi = RapidapiSource(rapidapi_key, dictionary)
         self._sources = [self._rapidapi]
-        self._dictionary = Dictionary()
+        self._update_interval = 60
 
-    async def update(self):
+    async def update_periodically(self):
         while True:
             await self.load_sources()
-            await asyncio.sleep(60)
+            await asyncio.sleep(self._update_interval)
 
     async def load_sources(self):
         for source in self._sources:

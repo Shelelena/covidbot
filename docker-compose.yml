@@ -5,6 +5,6 @@ services:
     container_name: covidbot-container
     build:
       context: .
-      dockerfile: compose/Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
-      - ./:/app
+      - ./logfile.log:/app/logfile.log
