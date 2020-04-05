@@ -19,6 +19,7 @@
     "великобритания": "uk",
     "соединенное королевство": "uk",
     "united kingdom": "uk",
+    "unitedkingdom": "uk",
     "great britain": "uk",
     "england": "uk",
     "сша": "usa",
@@ -36,5 +37,15 @@
     "curaccedilao": "curacao",
     "bonairesinteustatiusandsaba": "caribbeannetherlands",
     "turksandcaicosislands": "turksandcaicos",
-    "faroeislands": "faeroeislands"
+    "faroeislands": "faeroeislands",
+    "koreasouth": "skorea",
+    "burma": "myanmar",
+    "centralafricanrepublic": "car",
+    "congobrazzaville": "congo",
+    "cotedivoire": "ivorycoast",
+    "holysee": "vaticancity",
+    "saintvincentandthegrenadines": "stvincentgrenadines",
+    "unitedarabemirates": "uae",
+    "westbankandgaza": "palestine",
+    "congokinshasa": "drc"
 }

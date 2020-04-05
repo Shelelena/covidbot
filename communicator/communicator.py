@@ -1,4 +1,5 @@
 import logging
+import pathlib
 from .patterns import Patterns
 from .keyboard import RatingPaginationKeyboard
 
@@ -39,11 +40,19 @@ class Communicator:
         info = self.aggregator.country(country)
         if 'error' in info:
             return await self._send_error_message(message, info)
-        elif info['key'] == 'all':
-            rating = self.aggregator.rating(1, 5)
-            return await self._send_world_message(message, info, rating)
         else:
-            return await self._send_country_message(message, info)
+            graph = self.aggregator.graph(info['key'])
+            if info['key'] == 'all':
+                rating = self.aggregator.rating(1, 5)
+                sent_message = await self._send_world_message(
+                    message, info, rating, graph)
+            else:
+                sent_message = await self._send_country_message(
+                    message, info, graph)
+            if issubclass(type(graph), pathlib.Path):
+                self.aggregator.save_graph_id(
+                    info['key'],
+                    sent_message.photo[-1].file_id)
 
     @catch_uncatched
     async def send_rating(self, message):
@@ -70,16 +79,20 @@ class Communicator:
             rating, world, keyboard
         )
 
-    async def _send_country_message(self, message, info):
-        return await message.answer(
-            self.patterns.country(info),
-            parse_mode="Markdown"
+    async def _send_country_message(self, message, info, graph=None):
+        return await self._send_message(
+            message,
+            text=self.patterns.country(info),
+            parse_mode="Markdown",
+            photo=graph
         )
 
-    async def _send_world_message(self, message, info, rating):
-        return await message.answer(
-            self.patterns.world(info, rating),
-            parse_mode="Markdown"
+    async def _send_world_message(self, message, info, rating, graph=None):
+        return await self._send_message(
+            message,
+            text=self.patterns.world(info, rating),
+            parse_mode="Markdown",
+            photo=graph
         )
 
     async def _send_error_message(self, message, info):
@@ -101,6 +114,37 @@ class Communicator:
             parse_mode='Markdown',
             reply_markup=keyboard
         )
+
+    async def _send_message(
+        self,
+        message,
+        text,
+        parse_mode=None,
+        reply_markup=None,
+        photo=None
+    ):
+        if photo is None:
+            return await message.answer(
+                text=text,
+                parse_mode=parse_mode,
+                reply_markup=reply_markup
+            )
+        elif issubclass(type(photo), pathlib.Path):
+            with open(photo, 'rb') as file:
+                return await message.answer_photo(
+                    photo=file,
+                    caption=text,
+                    parse_mode=parse_mode,
+                    reply_markup=reply_markup
+                )
+        else:
+            logging.info(f'sending by file_id: {photo}')
+            return await message.answer_photo(
+                photo=photo,
+                caption=text,
+                parse_mode=parse_mode,
+                reply_markup=reply_markup
+            )
 
     def _countries_on_page(self, page):
         return (

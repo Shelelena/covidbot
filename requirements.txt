@@ -2,5 +2,6 @@ ipython
 aiogram
 httpx
 pandas
+matplotlib
 pytest
 pytest-asyncio
