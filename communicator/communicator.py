@@ -130,7 +130,7 @@ class Communicator:
                 reply_markup=reply_markup
             )
         elif issubclass(type(photo), pathlib.Path):
-            with open(photo, 'rb') as file:
+            with photo.open('rb') as file:
                 return await message.answer_photo(
                     photo=file,
                     caption=text,
@@ -138,7 +138,6 @@ class Communicator:
                     reply_markup=reply_markup
                 )
         else:
-            logging.info(f'sending by file_id: {photo}')
             return await message.answer_photo(
                 photo=photo,
                 caption=text,

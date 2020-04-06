@@ -21,6 +21,10 @@ class Aggregator:
                 await self.load_sources()
             except httpx._exceptions.ReadTimeout:
                 logging.error('ReadTimeout in source update')
+            except httpx._exceptions.ConConnectTimeoute:
+                logging.error('ConnectTimeout in source update')
+            except Exception:
+                logging.exception('Exception in source update')
             await asyncio.sleep(self._update_interval)
 
     async def load_sources(self):

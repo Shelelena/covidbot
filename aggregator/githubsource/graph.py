@@ -11,6 +11,8 @@ class GithubGraph:
     @classmethod
     def drop_all(cls):
         dir_path = pathlib.Path().cwd() / cls.directory
+        if not dir_path.exists():
+            dir_path.mkdir()
         for file in dir_path.glob('*.png'):
             logging.warning(f'removing {file.name}')
             file.unlink()
