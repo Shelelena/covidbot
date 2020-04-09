@@ -6,3 +6,4 @@ env/
 *.log
 **ipynb**
 temp_graphs
+.coverage

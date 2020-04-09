@@ -3,11 +3,11 @@ from unittest.mock import patch
 
 from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
-from .mocks import mock_load
+from .mocks import mock_load_rapidapi
 
 
 @pytest.fixture
-@patch.object(RapidapiSource, 'load_data', mock_load)
+@patch.object(RapidapiSource, 'load_data', mock_load_rapidapi)
 async def aggr():
     aggr = Aggregator()
     await aggr.load_sources()

@@ -3,5 +3,7 @@ aiogram
 httpx
 pandas
 matplotlib
+typeguard
 pytest
 pytest-asyncio
+pytest-cov

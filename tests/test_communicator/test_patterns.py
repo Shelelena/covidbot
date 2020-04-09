@@ -4,11 +4,11 @@ from unittest.mock import patch
 from communicator.patterns import Patterns
 from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
-from ..test_aggregator.mocks import mock_load
+from ..test_aggregator.mocks import mock_load_rapidapi
 
 
 @pytest.fixture
-@patch.object(RapidapiSource, 'load_data', mock_load)
+@patch.object(RapidapiSource, 'load_data', mock_load_rapidapi)
 async def aggr():
     aggr = Aggregator()
     await aggr.load_sources()

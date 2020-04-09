@@ -26,6 +26,9 @@ class CompatibilityDictionary:
             return self._keys_to_names
         return self._keys_to_names[key]
 
+    def keys(self):
+        return set(self._keys_to_names.keys())
+
 
 class DictLeavingMissings(dict):
     def __missing__(self, key):

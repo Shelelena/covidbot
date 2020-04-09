@@ -5,11 +5,11 @@ import pandas as pd
 
 from aggregator.rapidapisource import RapidapiSource
 from exceptions import CountryNotFound
-from .mocks import mock_load
+from .mocks import mock_load_rapidapi
 
 
 @pytest.fixture
-@patch.object(RapidapiSource, 'load_data', mock_load)
+@patch.object(RapidapiSource, 'load_data', mock_load_rapidapi)
 async def rapidapi():
     rapidapi = RapidapiSource()
     await rapidapi.update()
@@ -18,7 +18,7 @@ async def rapidapi():
 
 @pytest.mark.asyncio
 async def test_unwrap_column():
-    data = await mock_load()
+    data = await mock_load_rapidapi()
     data = json.loads(data)
     data = data['response']
     data = pd.DataFrame(data)
@@ -38,7 +38,7 @@ async def test_unwrap_column():
 @pytest.mark.asyncio
 async def test_prepare_data():
     rapidapi = RapidapiSource()
-    data = await mock_load()
+    data = await mock_load_rapidapi()
     data = rapidapi.prepare_data(data)
 
     assert type(data) is pd.DataFrame

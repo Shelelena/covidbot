@@ -94,11 +94,13 @@ class Patterns:
         data = info[name]
         if data is None:
             data = 'Нет'
+        if type(data) == float:
+            data = int(data)
         return f'{label}:\n`{data}`'
 
     @_vectorize
     def _in_one_line(self, info, number=False, code=False, bald=False):
-        line = str(info['total_cases'])
+        line = str(int(info['total_cases']))
         if code:
             line = '`' + line + '`'
         line = line + ' ' + str(info['country'])
