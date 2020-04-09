@@ -5,11 +5,12 @@ import logging
 
 
 class Source(ABC):
-    async def update(self):
-        data = await self.load_data()
-        self.data = self.prepare_data(data)
+    async def update(self) -> None:
+        data: str = await self.load_data()
+        data: pd.DataFrame = self.prepare_data(data)
+        self.data = data
         self.last_updated = datetime.now()
-        logging.info(f'Source updated: {type(self).__name__}')
+        self.log_update()
 
     @abstractmethod
     async def load_data(self) -> str:
@@ -24,3 +25,6 @@ class Source(ABC):
             return True
         time_since_last_update = datetime.now() - self.last_updated
         return time_since_last_update > self.expire_time
+
+    def log_update(self):
+        logging.info(f'Source updated: {type(self).__name__}')

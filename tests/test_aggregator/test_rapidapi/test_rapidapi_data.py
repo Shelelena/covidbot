@@ -1,8 +1,11 @@
 import pytest
-import json
-import pandas as pd
+from unittest.mock import patch, Mock
 from typing import List
 from typeguard import check_type
+
+import json
+import pandas as pd
+import logging
 
 from tests.mocks import mock_load
 from aggregator.rapidapisource.datapreparer import RapidapiDataPreparer
@@ -27,14 +30,34 @@ async def test_rapidapi_load():
 
 
 @pytest.mark.asyncio
+@patch.object(logging, 'warning', Mock())
 async def test_rapidapi_prepare_data():
     dictionary = CompatibilityDictionary()
     data: str = await mock_load_rapidapi()
 
-    data: pd.DataFrame = RapidapiDataPreparer.prepare(data, dictionary)
+    data = RapidapiDataPreparer.prepare(data, dictionary)
     assert type(data) == pd.DataFrame
+
+    dict_data = data.to_dict(orient='records')
+    check_type(None, dict_data, List[RapidapiCountryInfo])
+
     assert set(data.key) - dictionary.keys() == set()
     assert len(data) > 200
+    assert list(data.total_cases) == sorted(
+        list(data.total_cases), reverse=True)
+    assert list(data.number) == list(range(len(data)))
 
-    data = data.to_dict(orient='records')
-    check_type(None, data, List[RapidapiCountryInfo])
+    assert not logging.warning.called
+
+
+@pytest.mark.asyncio
+@patch.object(logging, 'warning', Mock())
+@patch.object(CompatibilityDictionary, 'keys', Mock())
+async def test_rapidapi_log_new_countries():
+    dictionary = CompatibilityDictionary()
+    dictionary.keys.return_value = {'us', 'russia', 'china'}
+
+    data = await mock_load_rapidapi()
+    data = RapidapiDataPreparer.prepare(data, dictionary)
+
+    assert logging.warning.called
