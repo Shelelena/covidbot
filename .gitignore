@@ -7,3 +7,4 @@ env/
 **ipynb**
 temp_graphs
 .coverage
+tests/mocks/mock_response_*.txt

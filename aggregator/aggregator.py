@@ -21,7 +21,7 @@ class Aggregator:
                 await self.load_sources()
             except httpx._exceptions.ReadTimeout:
                 logging.error('ReadTimeout in source update')
-            except httpx._exceptions.ConConnectTimeoute:
+            except httpx._exceptions.ConnectTimeout:
                 logging.error('ConnectTimeout in source update')
             except Exception:
                 logging.exception('Exception in source update')

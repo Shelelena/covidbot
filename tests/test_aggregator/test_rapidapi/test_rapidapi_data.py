@@ -18,7 +18,7 @@ mock_load_rapidapi = mock_load('RapidapiSource')
 
 
 @pytest.mark.asyncio
-async def test_rapidapi_load():
+async def test_rapidapi_load_data_structure():
     response: str = await mock_load_rapidapi()
 
     assert type(response) == str
@@ -38,8 +38,8 @@ async def test_rapidapi_prepare_data():
     data = RapidapiDataPreparer.prepare(data, dictionary)
     assert type(data) == pd.DataFrame
 
-    dict_data = data.to_dict(orient='records')
-    check_type(None, dict_data, List[RapidapiCountryInfo])
+    rows = data.to_dict(orient='records')
+    check_type(None, rows, List[RapidapiCountryInfo])
 
     assert set(data.key) - dictionary.keys() == set()
     assert len(data) > 200

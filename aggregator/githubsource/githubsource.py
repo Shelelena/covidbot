@@ -19,7 +19,7 @@ class GithubSource(Source):
         if self._dictionary is None:
             self._dictionary = CompatibilityDictionary()
 
-    def graph(self, key):
+    def graph(self, key: 'str'):
         if key in self.graph_ids:
             return self.graph_ids[key]
         elif key in self.graph_files:
@@ -34,7 +34,7 @@ class GithubSource(Source):
     def save_graph_id(self, key, id):
         self.graph_ids[key] = id
 
-    async def load_data(self):
+    async def load_data(self) -> str:
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://raw.githubusercontent.com/CSSEGISandData/COVID-19"
@@ -61,6 +61,6 @@ class GithubSource(Source):
 
     def _create_graph(self, key):
         country_name = self._dictionary.key_to_name(key)
-        data = self.data.loc[self.data.index == key]
+        data = self.data.loc[key]
         path = GithubGraph.draw_and_save(data, key, country_name)
         return path
