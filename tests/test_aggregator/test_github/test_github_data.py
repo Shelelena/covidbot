@@ -29,14 +29,14 @@ async def test_github_load_data_structure():
     assert all([
         re.match(r'^\d{1,2}/\d{1,2}/\d{1,2}$', date)
         for date in column_names[4:]
-    ])
+    ]), 'Date format is incorrect'
 
     assert all([
         all([
-            value.isnumeric() and int(value) >= 0
+            value.lstrip('+-').isnumeric()
             for value in row[4:]
         ]) for row in data[1:]
-    ])
+    ]), 'Unnumeric values'
 
 
 @pytest.mark.asyncio
@@ -52,6 +52,7 @@ async def test_github_data_preparer():
 
     exceptions = {'kosovo'}
     assert set(data.index) - dictionary.keys() == exceptions
+    assert 'all' in data.index
     assert len(data) > 200
 
 

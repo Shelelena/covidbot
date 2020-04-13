@@ -12,23 +12,6 @@ from aggregator.rapidapisource.schemas import RapidapiCountryInfo
 from exceptions import NoRapidapiKey, CountryNotFound
 
 
-@pytest.mark.asyncio
-async def test_no_key_error():
-    rapidapi = RapidapiSource()
-    with pytest.raises(NoRapidapiKey):
-        await rapidapi.update()
-
-
-@pytest.mark.asyncio
-@patch('httpx.AsyncClient.get', AsyncMock())
-async def test_load_data():
-    rapidapi = RapidapiSource('key')
-    data = await rapidapi.load_data()
-    assert httpx.AsyncClient.get.called
-    response = await httpx.AsyncClient.get()
-    assert data == response.text
-
-
 mock_load_rapidapi = mock_load('RapidapiSource')
 
 
@@ -38,6 +21,23 @@ async def rapidapi():
     rapidapi = RapidapiSource()
     await rapidapi.update()
     return rapidapi
+
+
+@pytest.mark.asyncio
+async def test_no_key_error():
+    rapidapi = RapidapiSource()
+    with pytest.raises(NoRapidapiKey):
+        await rapidapi.update()
+
+
+@pytest.mark.asyncio
+@patch('httpx.AsyncClient.get', AsyncMock())
+async def test_load_rapidapi_data():
+    rapidapi = RapidapiSource('key')
+    data = await rapidapi.load_data()
+    assert httpx.AsyncClient.get.called
+    response = await httpx.AsyncClient.get()
+    assert data == response.text
 
 
 def test_get_range_of_countries(rapidapi):

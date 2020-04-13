@@ -1,6 +1,6 @@
-import httpx
-from datetime import timedelta
 from typing import List
+import httpx
+from datetime import timedelta, datetime
 import pandas as pd
 
 from aggregator.sources import Source
@@ -11,11 +11,16 @@ from exceptions import CountryNotFound, NoRapidapiKey
 
 
 class RapidapiSource(Source):
-    def __init__(self, key=None, dictionary=None):
-        self._key = key
-        self.data = None
-        self.last_updated = None
+    def __init__(
+        self,
+        key: str = None,
+        dictionary: CompatibilityDictionary = None
+    ):
+        self._key: str = key
+        self.data: pd.DataFrame = None
+        self.last_updated: datetime = None
         self.expire_time = timedelta(minutes=10)
+
         self._dictionary = dictionary
         if self._dictionary is None:
             self._dictionary = CompatibilityDictionary()

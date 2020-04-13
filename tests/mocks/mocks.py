@@ -1,9 +1,9 @@
-import pathlib
+from pathlib import Path
 
 
 def mock_load(source_name):
     response_path = (
-        pathlib.Path(__file__).parent / f'mock_response_{source_name}.txt')
+        Path(__file__).parent / f'mock_response_{source_name}.txt')
     with response_path.open() as file:
         response = file.read()
 

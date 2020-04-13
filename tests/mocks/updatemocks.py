@@ -1,10 +1,10 @@
-import pathlib
+from pathlib import Path
 from config import RAPIDAPI_KEY
 from aggregator import Aggregator
 
 
 async def update_mocks():
-    directory = pathlib.Path(__file__).parent
+    directory = Path(__file__).parent
     aggr = Aggregator(rapidapi_key=RAPIDAPI_KEY)
 
     for source in aggr._sources:

@@ -1,5 +1,5 @@
 import logging
-import pathlib
+from pathlib import Path
 from .patterns import Patterns
 from .keyboard import RatingPaginationKeyboard
 
@@ -49,7 +49,7 @@ class Communicator:
             else:
                 sent_message = await self._send_country_message(
                     message, info, graph)
-            if issubclass(type(graph), pathlib.Path):
+            if issubclass(type(graph), Path):
                 self.aggregator.save_graph_id(
                     info['key'],
                     sent_message.photo[-1].file_id)
@@ -129,7 +129,7 @@ class Communicator:
                 parse_mode=parse_mode,
                 reply_markup=reply_markup
             )
-        elif issubclass(type(photo), pathlib.Path):
+        elif issubclass(type(photo), Path):
             with photo.open('rb') as file:
                 return await message.answer_photo(
                     photo=file,

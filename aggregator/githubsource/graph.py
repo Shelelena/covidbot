@@ -1,16 +1,16 @@
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import matplotlib.dates as mdates
-import pathlib
+from pathlib import Path
 import logging
+import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 
 class GithubGraph:
     directory = 'temp_graphs'
 
     @classmethod
-    def drop_all(cls):
-        dir_path = pathlib.Path().cwd() / cls.directory
+    def drop_all(cls) -> None:
+        dir_path = Path().cwd() / cls.directory
         if not dir_path.exists():
             dir_path.mkdir()
         for file in dir_path.glob('*.png'):
@@ -18,19 +18,25 @@ class GithubGraph:
             file.unlink()
 
     @classmethod
-    def draw_and_save(cls, data, key, name):
-        fig = cls.draw(data, name)
-        file_path = cls.save(fig, key)
+    def draw_and_save(
+        cls,
+        data: pd.Series,
+        country_name: str,
+        file_name: str,
+    ) -> Path:
+
+        fig = cls.draw(data, country_name)
+        file_path = cls.save(fig, file_name)
         return file_path
 
     @classmethod
-    def save(cls, fig, key):
-        file_path = pathlib.Path.cwd() / cls.directory / f'{key}_total.png'
+    def save(cls, fig: mpl.figure.Figure, file_name: str) -> Path:
+        file_path = Path.cwd() / cls.directory / f'{file_name}.png'
         fig.savefig(file_path, dpi=fig.dpi)
         return file_path
 
     @classmethod
-    def draw(cls, data, name):
+    def draw(cls, data: pd.Series, name: str) -> mpl.figure.Figure:
         logging.info(f'drawing: {name}')
 
         fig, ax = plt.subplots()
@@ -44,14 +50,14 @@ class GithubGraph:
         ax.set_ylim(bottom=0)
         ax.grid(which='major', linestyle=':')
 
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(
+        ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(
             cls._reformat_large_tick_values))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d.%m"))
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter("%d.%m"))
 
         return fig
 
     @staticmethod
-    def _reformat_large_tick_values(value, pos):
+    def _reformat_large_tick_values(value: int, pos=None) -> str:
         if value >= 1000_000_000:
             result = round(value/1000_000_000, 1)
             result = f'{result}B'
