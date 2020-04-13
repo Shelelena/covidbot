@@ -22,6 +22,7 @@ def test_abstract_methods_not_inherited():
 class MinimalHeir(Source):
     def __init__(self):
         self.expire_time = timedelta(seconds=30)
+        self.last_updated = None
 
     async def load_data(self):
         return 'data'
@@ -37,6 +38,7 @@ def test_minimal_heir():
 
 def test_is_expired():
     heir = MinimalHeir()
+    assert heir.is_expired()
     heir.last_updated = datetime.now() - timedelta(minutes=1)
     assert heir.is_expired()
 

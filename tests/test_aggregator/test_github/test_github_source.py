@@ -97,13 +97,13 @@ def test_get_graph(github):
     assert github.graph_ids == {}
     assert result == GithubGraph.draw_and_save()
 
-    github.graph_file_paths['us'] = 'us_file_path'
-    result = github.graph('us')
+    github.graph_file_paths['usa'] = 'us_file_path'
+    result = github.graph('usa')
     assert result == 'us_file_path'
 
-    github.save_graph_id('us', 'us_file_id')
-    assert github.graph_ids == {'us': 'us_file_id'}
-    result = github.graph('us')
+    github.save_graph_id('usa', 'us_file_id')
+    assert github.graph_ids == {'usa': 'us_file_id'}
+    result = github.graph('usa')
     assert result == 'us_file_id'
 
     with pytest.raises(CountryNotFound):

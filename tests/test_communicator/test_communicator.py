@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, AsyncMock
+
 from communicator import Communicator
 
 
@@ -37,10 +38,37 @@ async def test_country(comm):
     await comm.send_country(message, 'country_1')
 
     comm.aggregator.country.assert_called_once_with('country_1')
+    comm.aggregator.graph.assert_called_once_with('country_1')
     comm.patterns.country.assert_called_once_with(
         comm.aggregator.country())
+    message.answer_photo.assert_called_once_with(
+        photo=comm.aggregator.graph(),
+        caption=comm.patterns.country(),
+        parse_mode="Markdown",
+        reply_markup=None)
+
+
+@pytest.mark.asyncio
+async def test_country_with_no_graph(comm):
+    comm.aggregator.graph.return_value = None
+    message = AsyncMock()
+    await comm.send_country(message, 'country_5')
+
     message.answer.assert_called_once_with(
-        comm.patterns.country(), parse_mode="Markdown")
+        text=comm.patterns.country(),
+        parse_mode="Markdown",
+        reply_markup=None)
+
+
+@pytest.mark.asyncio
+async def test_country_with_graph_sent_first_time(comm, tmp_path):
+    (tmp_path / 'file.png').touch()
+    comm.aggregator.graph.return_valtmp_path / 'file.png'
+    comm.aggregator.graph.return_value = tmp_path / 'file.png'
+    message = AsyncMock()
+    await comm.send_country(message, 'country_5')
+
+    comm.aggregator.save_graph_id.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -49,11 +77,16 @@ async def test_world(comm):
     message = AsyncMock()
     await comm.send_country(message, 'country_3')
 
+    comm.aggregator.country.assert_called_once_with('country_3')
+    comm.aggregator.graph.assert_called_once_with('country_3')
     comm.aggregator.rating.assert_called_once_with(1, 5)
     comm.patterns.world.assert_called_once_with(
         comm.aggregator.country(), comm.aggregator.rating())
-    message.answer.assert_called_once_with(
-        comm.patterns.world(), parse_mode="Markdown")
+    message.answer_photo.assert_called_once_with(
+        photo=comm.aggregator.graph(),
+        caption=comm.patterns.world(),
+        parse_mode="Markdown",
+        reply_markup=None)
 
 
 @pytest.mark.asyncio

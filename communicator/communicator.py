@@ -41,7 +41,7 @@ class Communicator:
         if 'error' in info:
             return await self._send_error_message(message, info)
         else:
-            graph = self.aggregator.graph(info['key'])
+            graph = self.aggregator.graph(country)
             if info['key'] == 'all':
                 rating = self.aggregator.rating(1, 5)
                 sent_message = await self._send_world_message(
@@ -49,10 +49,7 @@ class Communicator:
             else:
                 sent_message = await self._send_country_message(
                     message, info, graph)
-            if issubclass(type(graph), Path):
-                self.aggregator.save_graph_id(
-                    info['key'],
-                    sent_message.photo[-1].file_id)
+            self._save_graph_id(graph, info['key'], sent_message)
 
     @catch_uncatched
     async def send_rating(self, message):
@@ -171,3 +168,9 @@ class Communicator:
         except Exception:
             logging.error(
                 f'error report failed; chat_id: {message.chat.id}')
+
+    def _save_graph_id(self, graph, key, sent_message):
+        if issubclass(type(graph), Path):
+            self.aggregator.save_graph_id(
+                key,
+                sent_message.photo[-1].file_id)

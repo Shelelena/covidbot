@@ -1,21 +1,58 @@
 import pytest
 from unittest.mock import patch
+from typing import List
+from typeguard import check_type
 
 from communicator.patterns import Patterns
 from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
-from ..test_aggregator.mocks import mock_load_rapidapi
+from aggregator.rapidapisource.schemas import RapidapiCountryInfo
+from aggregator.githubsource import GithubSource
+from tests.mocks import mock_load
 
 
 @pytest.fixture
-@patch.object(RapidapiSource, 'load_data', mock_load_rapidapi)
+def mocked_info():
+    info = [
+        {
+            'key': 'all', 'country': 'Мир', 'number': 0,
+            'total_cases': 723319, 'new_cases': '+960',
+            'recovered_cases': 101010,
+            'total_deaths': 33993, 'new_deaths': '+5001',
+        },
+        {
+            'key': 'usa', 'country': 'США', 'number': 1,
+            'total_cases': 112560, 'new_cases': '+8434',
+            'recovered_cases': 3219,
+            'total_deaths': 1878, 'new_deaths': '+182',
+        },
+        {
+            'key': 'italy', 'country': 'Италия', 'number': 2,
+            'total_cases': 86498, 'new_cases': '+5909',
+            'recovered_cases': 10950,
+            'total_deaths': 9134, 'new_deaths': '+919',
+        },
+        {
+            'key': 'china', 'country': 'Китай', 'number': 3,
+            'total_cases': 81394, 'new_cases': '+54',
+            'recovered_cases': 74971,
+            'total_deaths': 3295, 'new_deaths': '+3',
+        },
+    ]
+    check_type(None, info, List[RapidapiCountryInfo])
+    return info
+
+
+@pytest.fixture
+@patch.object(RapidapiSource, 'load_data', mock_load('RapidapiSource'))
+@patch.object(GithubSource, 'load_data', mock_load('GithubSource'))
 async def aggr():
     aggr = Aggregator()
     await aggr.load_sources()
     return aggr
 
 
-def test_greeting_pattern():
+def test_greeting_pattern(mocked_info):
     patterns = Patterns()
     greeting = patterns.greeting()
     assert type(greeting) is str
@@ -39,61 +76,32 @@ def test_error():
     )
 
 
-def test_country_pattern():
-    info = {
-        'key': 'france',
-        'country': 'Франция',
-        'day': '2020-03-28',
-        'time': '2020-03-28T17:15:05+00:00',
-        'new_cases': '+3809',
-        'active_cases': 25269,
-        'critical_cases': 3787,
-        'recovered_cases': 5700,
-        'total_cases': 32964,
-        'new_deaths': '+299',
-        'total_deaths': 1995,
-        'number': 7,
-    }
+def test_country_pattern(mocked_info):
+    info = mocked_info[1]
     country = Patterns().country(info)
     assert country == (
-        '*Франция*\n\n'
-        'Всего подтвержденных случаев:\n`32964`\n'
-        'Новые случаи за сегодня:\n`+3809`\n'
-        'Всего погибших:\n`1995`\n'
-        'Погибших за сегодня:\n`+299`\n'
-        'Выздоровевшие:\n`5700`\n\n'
-        '/c\\_france - обновить данные\n'
+        '*США*\n\n'
+        'Всего подтвержденных случаев:\n`112560`\n'
+        'Новые случаи за сегодня:\n`+8434`\n'
+        'Всего погибших:\n`1878`\n'
+        'Погибшие за сегодня:\n`+182`\n'
+        'Выздоровевшие:\n`3219`\n\n'
+        '/c\\_usa - обновить данные\n'
         '/all - статистика по миру\n'
         '/rating - рейтинг стран'
     )
 
 
-def test_country_pattern_on_aggregator(aggr):
-    info = aggr.country('франция')
-    country = Patterns().country(info)
-    assert country == (
-        '*Франция*\n\n'
-        'Всего подтвержденных случаев:\n`32964`\n'
-        'Новые случаи за сегодня:\n`+3809`\n'
-        'Всего погибших:\n`1995`\n'
-        'Погибших за сегодня:\n`+299`\n'
-        'Выздоровевшие:\n`5700`\n\n'
-        '/c\\_france - обновить данные\n'
-        '/all - статистика по миру\n'
-        '/rating - рейтинг стран'
-    )
-
-
-def test_world_pattern_on_aggregator(aggr):
-    info = aggr.country('all')
-    rating = aggr.rating(1, 3)
+def test_world_pattern_on_aggregator(mocked_info):
+    info = mocked_info[0]
+    rating = mocked_info[1:]
     world = Patterns().world(info, rating)
     assert world == (
         '*Мир*\n\n'
         'Всего подтвержденных случаев:\n`723319`\n'
         'Новые случаи за сегодня:\n`+960`\n'
         'Всего погибших:\n`33993`\n'
-        'Погибших за сегодня:\n`+5001`\n'
+        'Погибшие за сегодня:\n`+5001`\n'
         'Выздоровевшие:\n`101010`\n\n'
         '*Топ 5 стран*\n\n'
         '1. `112560` США    -> /c\\_usa\n'
@@ -104,9 +112,9 @@ def test_world_pattern_on_aggregator(aggr):
     )
 
 
-def test_rating_pattern_on_aggregator(aggr):
-    rating = aggr.rating(1, 3)
-    world = aggr.country()
+def test_rating_pattern_on_aggregator(mocked_info):
+    rating = mocked_info[1:]
+    world = mocked_info[0]
     result = Patterns().rating(rating, world)
     assert result == (
         '*723319 Мир*    -> /all\n\n'

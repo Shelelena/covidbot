@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 import httpx
 from pathlib import Path
 from datetime import timedelta, datetime
@@ -26,7 +26,8 @@ class GithubSource(Source):
         if self._dictionary is None:
             self._dictionary = CompatibilityDictionary()
 
-    def graph(self, key: 'str'):
+    def graph(self, name: 'str') -> Union[Path, str, None]:
+        key = self._dictionary.name_to_key(name)
         if key in self.graph_ids:
             return self.graph_ids[key]
         elif key in self.graph_file_paths:
