@@ -1,8 +1,9 @@
 import logging
+from config import MY_CHAT_ID
 
 
 def log(coroutine):
-    exceptions = [206980992]  # без кода непонятно, что это чат айди
+    chat_id_exceptions = [MY_CHAT_ID]
 
     async def wrapped(query, *args, **kwargs):
         del(kwargs['state'])
@@ -20,7 +21,7 @@ def log(coroutine):
         if text is None and message is None:
             logging.warning(f'Very strange query: {str(query)}')
 
-        elif message.chat.id not in exceptions:
+        elif message.chat.id not in chat_id_exceptions:
             if text == '/start':
                 logging.info('!new greeting!')
             logging.info(

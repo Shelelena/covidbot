@@ -1,6 +1,8 @@
 from typing import Tuple, List, Optional
 from aggregator import CountryInfo
 
+from config import MY_TELEGRAM_USERNAME
+
 
 class Patterns:
 
@@ -36,7 +38,7 @@ class Patterns:
             'Источники данных: https://rapidapi.com/api-sports/api/covid-193, '
             'https://github.com/CSSEGISandData/COVID-19. '
             'Данные обновляются раз в 15 минут.\n'
-            'Баг репорт - @shel_elena'
+            'Баг репорт - ' + MY_TELEGRAM_USERNAME
         )
 
     def country(self, info: CountryInfo) -> str:
