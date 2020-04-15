@@ -8,5 +8,3 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ./logfile.log:/app/logfile.log
-      - ./aggregator/keys_to_names.json:/app/aggregator/keys_to_names.json
-      - ./aggregator/names_to_keys.json:/app/aggregator/names_to_keys.json
