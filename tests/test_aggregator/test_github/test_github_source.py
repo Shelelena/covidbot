@@ -10,7 +10,7 @@ from tests.mocks import mock_load
 from aggregator.githubsource import GithubSource
 from aggregator.githubsource.datapreparer import GithibDataPreparer
 from aggregator.githubsource.graph import GithubGraph
-from aggregator.dictionary import CompatibilityDictionary
+from aggregator.matcher import CountryNameMatcher
 from exceptions import CountryNotFound
 
 
@@ -38,7 +38,7 @@ async def test_load_github_data():
 @pytest.mark.asyncio
 async def test_data_is_new():
     data = await mock_load_github()
-    data = GithibDataPreparer.prepare(data, CompatibilityDictionary())
+    data = GithibDataPreparer.prepare(data, CountryNameMatcher())
     github = GithubSource()
     assert github._new_data(data)
 

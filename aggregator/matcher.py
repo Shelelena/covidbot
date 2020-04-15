@@ -2,7 +2,7 @@ import json
 import os
 
 
-class CompatibilityDictionary:
+class CountryNameMatcher:
     def __init__(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         with open(dir_path + '/keys_to_names.json') as file:

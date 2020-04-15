@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 
 from .schemas import RapidapiResponse
-from aggregator.dictionary import CompatibilityDictionary
+from aggregator.matcher import CountryNameMatcher
 
 
 class RapidapiDataPreparer:
@@ -12,17 +12,17 @@ class RapidapiDataPreparer:
     def prepare(
         cls,
         data: str,
-        dictionary: CompatibilityDictionary
+        matcher: CountryNameMatcher
     ) -> pd.DataFrame:
 
         data: pd.DataFrame = cls._json_to_dataframe(data)
         data = cls._unwrap_columns(data)
         data = cls._choose_columns(data)
         data = cls._convert_types(data)
-        data = cls._set_country_keys_and_names(data, dictionary)
+        data = cls._set_country_keys_and_names(data, matcher)
         data = cls._remove_non_countries(data)
         data = cls._sort_and_enumerate(data)
-        cls._check_new_countries(data, dictionary)
+        cls._check_new_countries(data, matcher)
         return data
 
     @staticmethod
@@ -67,13 +67,13 @@ class RapidapiDataPreparer:
         return data
 
     @staticmethod
-    def _set_country_keys_and_names(data, dictionary) -> pd.DataFrame:
+    def _set_country_keys_and_names(data, matcher) -> pd.DataFrame:
         data = data.copy()
         data['key'] = data.country.str.lower()
         data.key = data.key.str.replace(r'[\.\-\&\;]', '')
-        data.key = data.key.map(dictionary.name_to_key())
+        data.key = data.key.map(matcher.name_to_key())
         data = data.drop_duplicates(subset=['key'])
-        data.country = data.key.map(dictionary.key_to_name())
+        data.country = data.key.map(matcher.key_to_name())
         return data
 
     @staticmethod
@@ -95,9 +95,9 @@ class RapidapiDataPreparer:
         return data
 
     @staticmethod
-    def _check_new_countries(data, dictionary) -> None:
+    def _check_new_countries(data, matcher) -> None:
         new_countries = set(data.key)
-        old_countries = dictionary.keys()
+        old_countries = matcher.keys()
         difference = new_countries - old_countries
         if len(difference) > 0:
             logging.warning(

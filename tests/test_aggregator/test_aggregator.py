@@ -53,7 +53,7 @@ async def test_update():
 
 def test_get_country(aggr):
     for _ in range(5):
-        country = random.choice(list(aggr._rapidapi._dictionary.keys()))
+        country = random.choice(list(aggr._rapidapi._matcher.keys()))
         result = aggr.country(country)
 
         check_type(None, result, RapidapiCountryInfo)

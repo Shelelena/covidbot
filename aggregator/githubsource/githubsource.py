@@ -6,7 +6,7 @@ import pandas as pd
 
 from exceptions import CountryNotFound
 from ..sources import Source
-from ..dictionary import CompatibilityDictionary
+from ..matcher import CountryNameMatcher
 from .datapreparer import GithibDataPreparer
 from .graph import GithubGraph
 
@@ -14,7 +14,7 @@ from .graph import GithubGraph
 class GithubSource(Source):
     def __init__(
         self,
-        dictionary: CompatibilityDictionary = None
+        matcher: CountryNameMatcher = None
     ):
         self.data: pd.DataFrame = None
         self.last_updated: datetime = None
@@ -22,12 +22,12 @@ class GithubSource(Source):
         self.graph_file_paths: Dict[str, Path] = {}
         self.expire_time = timedelta(hours=3)
 
-        self._dictionary = dictionary
-        if self._dictionary is None:
-            self._dictionary = CompatibilityDictionary()
+        self._matcher = matcher
+        if self._matcher is None:
+            self._matcher = CountryNameMatcher()
 
     def graph(self, name: 'str') -> Union[Path, str, None]:
-        key = self._dictionary.name_to_key(name)
+        key = self._matcher.name_to_key(name)
         if key in self.graph_ids:
             return self.graph_ids[key]
         elif key in self.graph_file_paths:
@@ -51,7 +51,7 @@ class GithubSource(Source):
         return response.text
 
     def prepare_data(self, data: str) -> pd.DataFrame:
-        data = GithibDataPreparer.prepare(data, self._dictionary)
+        data = GithibDataPreparer.prepare(data, self._matcher)
         if self._new_data(data):
             self._drop_graphs()
         return data
@@ -68,7 +68,7 @@ class GithubSource(Source):
         self.graph_file_paths = {}
 
     def _create_graph(self, key: str) -> Path:
-        country_name: str = self._dictionary.key_to_name(key)
+        country_name: str = self._matcher.key_to_name(key)
         data: pd.Series = self.data.loc[key]
         file_name = f'{key}_total'
         path = GithubGraph.draw_and_save(data, country_name, file_name)

@@ -4,7 +4,7 @@ from datetime import timedelta, datetime
 import pandas as pd
 
 from aggregator.sources import Source
-from aggregator.dictionary import CompatibilityDictionary
+from aggregator.matcher import CountryNameMatcher
 from .datapreparer import RapidapiDataPreparer
 from .schemas import RapidapiCountryInfo
 from exceptions import CountryNotFound, NoRapidapiKey
@@ -14,19 +14,19 @@ class RapidapiSource(Source):
     def __init__(
         self,
         key: str = None,
-        dictionary: CompatibilityDictionary = None
+        matcher: CountryNameMatcher = None
     ):
         self._key: str = key
         self.data: pd.DataFrame = None
         self.last_updated: datetime = None
         self.expire_time = timedelta(minutes=10)
 
-        self._dictionary = dictionary
-        if self._dictionary is None:
-            self._dictionary = CompatibilityDictionary()
+        self._matcher = matcher
+        if self._matcher is None:
+            self._matcher = CountryNameMatcher()
 
     def single_country(self, name='all') -> RapidapiCountryInfo:
-        key = self._dictionary.name_to_key(name)
+        key = self._matcher.name_to_key(name)
         country: list = self.countries_by_keys(key)
         if len(country) == 0:
             raise CountryNotFound(f'No such country: {country}')
@@ -58,5 +58,5 @@ class RapidapiSource(Source):
         return response.text
 
     def prepare_data(self, data: str) -> pd.DataFrame:
-        data = RapidapiDataPreparer.prepare(data, self._dictionary)
+        data = RapidapiDataPreparer.prepare(data, self._matcher)
         return data

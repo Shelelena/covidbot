@@ -10,7 +10,7 @@ from datetime import datetime
 
 from tests.mocks import mock_load
 from aggregator.githubsource.datapreparer import GithibDataPreparer
-from aggregator.dictionary import CompatibilityDictionary
+from aggregator.matcher import CountryNameMatcher
 
 
 mock_load_github = mock_load('GithubSource')
@@ -41,34 +41,34 @@ async def test_github_load_data_structure():
 
 @pytest.mark.asyncio
 async def test_github_data_preparer():
-    dictionary = CompatibilityDictionary()
+    matcher = CountryNameMatcher()
     data: str = await mock_load_github()
 
-    data = GithibDataPreparer.prepare(data, dictionary)
+    data = GithibDataPreparer.prepare(data, matcher)
     assert type(data) == pd.DataFrame
 
     columns = data.to_dict()
     check_type(None, columns, Dict[datetime, Dict[str, int]])
 
     exceptions = {'kosovo'}
-    assert set(data.index) - dictionary.keys() == exceptions
+    assert set(data.index) - matcher.keys() == exceptions
     assert 'all' in data.index
     assert len(data) > 200
 
 
 @pytest.mark.asyncio
 async def test_region_handling():
-    dictionary = CompatibilityDictionary()
+    matcher = CountryNameMatcher()
     data: str = await mock_load_github()
 
     data = GithibDataPreparer._csv_to_dataframe(data)
     data = GithibDataPreparer._colnames_to_datetime(data)
     data = GithibDataPreparer._country_and_region_names_to_keys(
-        data, dictionary)
+        data, matcher)
 
     unhandled_regions = data.filter(['country', 'region']).dropna()
     unhandled_regions = unhandled_regions.loc[
-        ~unhandled_regions.region.isin(dictionary.keys())]
+        ~unhandled_regions.region.isin(matcher.keys())]
     exceptions = {'australia', 'canada', 'china'}
     unhandled_regions = unhandled_regions.loc[
         ~unhandled_regions.country.isin(exceptions)]

@@ -11,7 +11,7 @@ from tests.mocks import mock_load
 from aggregator.rapidapisource.datapreparer import RapidapiDataPreparer
 from aggregator.rapidapisource.schemas import RapidapiCountryInfo
 from aggregator.rapidapisource.schemas import RapidapiResponse
-from aggregator.dictionary import CompatibilityDictionary
+from aggregator.matcher import CountryNameMatcher
 
 
 mock_load_rapidapi = mock_load('RapidapiSource')
@@ -32,16 +32,16 @@ async def test_rapidapi_load_data_structure():
 @pytest.mark.asyncio
 @patch.object(logging, 'warning', Mock())
 async def test_rapidapi_prepare_data():
-    dictionary = CompatibilityDictionary()
+    matcher = CountryNameMatcher()
     data: str = await mock_load_rapidapi()
 
-    data = RapidapiDataPreparer.prepare(data, dictionary)
+    data = RapidapiDataPreparer.prepare(data, matcher)
     assert type(data) == pd.DataFrame
 
     rows = data.to_dict(orient='records')
     check_type(None, rows, List[RapidapiCountryInfo])
 
-    assert set(data.key) - dictionary.keys() == set()
+    assert set(data.key) - matcher.keys() == set()
     assert len(data) > 200
     assert list(data.total_cases) == sorted(
         list(data.total_cases), reverse=True)
@@ -52,12 +52,12 @@ async def test_rapidapi_prepare_data():
 
 @pytest.mark.asyncio
 @patch.object(logging, 'warning', Mock())
-@patch.object(CompatibilityDictionary, 'keys', Mock())
+@patch.object(CountryNameMatcher, 'keys', Mock())
 async def test_rapidapi_log_new_countries():
-    dictionary = CompatibilityDictionary()
-    dictionary.keys.return_value = {'us', 'russia', 'china'}
+    matcher = CountryNameMatcher()
+    matcher.keys.return_value = {'us', 'russia', 'china'}
 
     data = await mock_load_rapidapi()
-    data = RapidapiDataPreparer.prepare(data, dictionary)
+    data = RapidapiDataPreparer.prepare(data, matcher)
 
     assert logging.warning.called

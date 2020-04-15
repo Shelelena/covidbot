@@ -10,7 +10,7 @@ import numpy
 from tests.mocks import mock_load
 from aggregator.githubsource.datapreparer import GithibDataPreparer
 from aggregator.githubsource.graph import GithubGraph
-from aggregator.dictionary import CompatibilityDictionary
+from aggregator.matcher import CountryNameMatcher
 
 
 mock_load_github = mock_load('GithubSource')
@@ -19,15 +19,15 @@ mock_load_github = mock_load('GithubSource')
 @pytest.fixture
 async def data():
     data = await mock_load_github()
-    dictionary = CompatibilityDictionary()
-    data = GithibDataPreparer.prepare(data, dictionary)
+    matcher = CountryNameMatcher()
+    data = GithibDataPreparer.prepare(data, matcher)
     return data
 
 
 def test_graph(data):
     for _ in range(5):
         key = random.choice(data.index)
-        name = CompatibilityDictionary().key_to_name(key)
+        name = CountryNameMatcher().key_to_name(key)
         country = data.loc[key]
 
         fig = GithubGraph.draw(country, name)
@@ -56,7 +56,7 @@ def test_graph(data):
 def test_save_graph(data, tmpdir):
     for _ in range(5):
         key = random.choice(data.index)
-        name = CompatibilityDictionary().key_to_name(key)
+        name = CountryNameMatcher().key_to_name(key)
         country = data.loc[key]
         fig = GithubGraph.draw(country, name)
 

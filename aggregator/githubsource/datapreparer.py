@@ -2,7 +2,7 @@ import io
 import pandas as pd
 from datetime import datetime
 
-from aggregator.dictionary import CompatibilityDictionary
+from aggregator.matcher import CountryNameMatcher
 
 
 class GithibDataPreparer:
@@ -11,13 +11,13 @@ class GithibDataPreparer:
     def prepare(
         cls,
         data: str,
-        dictionary: CompatibilityDictionary
+        matcher: CountryNameMatcher
     ) -> pd.DataFrame:
 
         data: pd.DataFrame = cls._csv_to_dataframe(data)
         data = cls._colnames_to_datetime(data)
-        data = cls._country_and_region_names_to_keys(data, dictionary)
-        data = cls._collapse_regions_to_countries(data, dictionary)
+        data = cls._country_and_region_names_to_keys(data, matcher)
+        data = cls._collapse_regions_to_countries(data, matcher)
         data = cls._summarize_countries(data)
         data = cls._add_world(data)
         return data
@@ -38,22 +38,22 @@ class GithibDataPreparer:
         return data
 
     @staticmethod
-    def _country_and_region_names_to_keys(data, dictionary) -> pd.DataFrame:
+    def _country_and_region_names_to_keys(data, matcher) -> pd.DataFrame:
         data = data.copy()
         for colname in ('country', 'region'):
             data[colname] = data[colname].str.lower()
             data[colname] = data[colname].str.replace(
                 r"[ \(\)\*\'\.\,\-\&\;]", '')
-            data[colname] = data[colname].map(dictionary.name_to_key())
+            data[colname] = data[colname].map(matcher.name_to_key())
         return data
 
     @classmethod
-    def _collapse_regions_to_countries(cls, data, dictionary) -> pd.DataFrame:
+    def _collapse_regions_to_countries(cls, data, matcher) -> pd.DataFrame:
         data = data.copy()
         data.country = data.apply(
             lambda row:
                 row.region
-                if row.region in dictionary.keys()
+                if row.region in matcher.keys()
                 else row.country,
             axis=1
         )

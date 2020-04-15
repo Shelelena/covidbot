@@ -1,3 +1,4 @@
+from typing import List, Union
 from aiogram import types
 from aiogram.utils.callback_data import CallbackData
 
@@ -5,19 +6,19 @@ from aiogram.utils.callback_data import CallbackData
 class RatingPaginationKeyboard:
     def __init__(self, total_number_of_pages=11):
         self.callback = CallbackData('rating_page', 'page')
-        self._last_page = total_number_of_pages
-        self._page_id_prefix = 'rating_page:'
-        self.current_page_name = 'current'
+        self._last_page: int = total_number_of_pages
+        self._page_id_prefix: str = 'rating_page:'
+        self.current_page_name: str = 'current'
 
-    def create(self, current_page=1):
-        page_numbers = self._page_numbers(current_page)
+    def create(self, current_page: int = 1) -> types.InlineKeyboardMarkup:
+        page_numbers: List[int] = self._page_numbers(current_page)
         page_images = self._page_images(current_page, page_numbers)
         page_numbers = self._mark_current(current_page, page_numbers)
 
         keyboard = self._keyboard(page_images, page_numbers)
         return keyboard
 
-    def _page_numbers(self, current_page):
+    def _page_numbers(self, current_page: int) -> List[int]:
         if current_page < 4:
             pages = [1, 2, 3, 4, self._last_page]
         elif current_page > self._last_page - 3:
@@ -36,7 +37,11 @@ class RatingPaginationKeyboard:
                 self._last_page]
         return pages
 
-    def _page_images(self, current_page, page_numbers):
+    def _page_images(
+        self, current_page: int,
+        page_numbers: List[int]
+    ) -> List[str]:
+
         page_images = [str(i) for i in page_numbers]
         if current_page >= 4:
             page_images[0] = '<< ' + page_images[0]
@@ -48,12 +53,22 @@ class RatingPaginationKeyboard:
             '- ' + page_images[page_numbers.index(current_page)] + ' -')
         return page_images
 
-    def _mark_current(self, current_page, page_numbers):
+    def _mark_current(
+        self,
+        current_page: int,
+        page_numbers: List[int]
+    ) -> List[Union[int, str]]:
+
         page_numbers = page_numbers.copy()
         page_numbers[page_numbers.index(current_page)] = self.current_page_name
         return page_numbers
 
-    def _keyboard(self, page_images, page_numbers):
+    def _keyboard(
+        self,
+        page_images: List[str],
+        page_numbers: List[Union[int, str]]
+    ) -> types.InlineKeyboardMarkup:
+
         buttons = [
             types.InlineKeyboardButton(
                 text=image,

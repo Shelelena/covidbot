@@ -8,14 +8,14 @@ from .rapidapisource import RapidapiSource
 from .rapidapisource.schemas import RapidapiCountryInfo
 from .githubsource import GithubSource
 from exceptions import CountryNotFound
-from .dictionary import CompatibilityDictionary
+from .matcher import CountryNameMatcher
 
 
 class Aggregator:
     def __init__(self, rapidapi_key=None):
-        dictionary = CompatibilityDictionary()
-        self._rapidapi = RapidapiSource(rapidapi_key, dictionary)
-        self._github = GithubSource(dictionary)
+        matcher = CountryNameMatcher()
+        self._rapidapi = RapidapiSource(rapidapi_key, matcher)
+        self._github = GithubSource(matcher)
         self._sources = [self._rapidapi, self._github]
         self._update_interval = 60
 
