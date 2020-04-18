@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  
+  covidbot:
+    container_name: covidbot-container
+    image: covidbot_covidbot:latest
+    volumes:
+      - ./logfile.log:/app/logfile.log

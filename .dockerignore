@@ -6,3 +6,5 @@ env/
 temp_graphs/*
 .coverage
 tests/mocks/mock_response_*.txt
+docker_images
+deploy.sh
