@@ -7,6 +7,7 @@ from pathlib import Path
 from .rapidapisource import RapidapiSource
 from .rapidapisource.schemas import RapidapiCountryInfo
 from .githubsource import GithubSource
+from .stopcoronasource import StopcoronaSource
 from exceptions import CountryNotFound
 from .matcher import CountryNameMatcher
 
@@ -16,7 +17,8 @@ class Aggregator:
         matcher = CountryNameMatcher()
         self._rapidapi = RapidapiSource(rapidapi_key, matcher)
         self._github = GithubSource(matcher)
-        self._sources = [self._rapidapi, self._github]
+        self._stopcorona = StopcoronaSource(matcher)
+        self._sources = [self._rapidapi, self._github, self._stopcorona]
         self._update_interval = 60
 
     async def update_periodically(self) -> None:

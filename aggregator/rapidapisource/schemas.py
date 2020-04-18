@@ -3,7 +3,7 @@ from typing import TypedDict, List, Optional
 
 class RapidapiCountryInfo(TypedDict):
     key: str
-    country: str
+    name: str
     number: int
 
     total_cases: int

@@ -1,8 +1,10 @@
 ipython
 aiogram
 httpx
+beautifulsoup4
 pandas
 matplotlib
+transliterate
 typeguard
 pytest
 pytest-asyncio

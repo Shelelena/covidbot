@@ -70,10 +70,11 @@ class RapidapiDataPreparer:
     def _set_country_keys_and_names(data, matcher) -> pd.DataFrame:
         data = data.copy()
         data['key'] = data.country.str.lower()
+        del data['country']
         data.key = data.key.str.replace(r'[\.\-\&\;]', '')
         data.key = data.key.map(matcher.name_to_key())
         data = data.drop_duplicates(subset=['key'])
-        data.country = data.key.map(matcher.key_to_name())
+        data['name'] = data.key.map(matcher.key_to_name())
         return data
 
     @staticmethod

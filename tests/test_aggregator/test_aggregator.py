@@ -11,6 +11,7 @@ from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
 from aggregator.rapidapisource.schemas import RapidapiCountryInfo
 from aggregator.githubsource import GithubSource
+from aggregator.stopcoronasource import StopcoronaSource
 from tests.mocks import mock_load
 from exceptions import CountryNotFound
 
@@ -18,6 +19,7 @@ from exceptions import CountryNotFound
 @pytest.fixture
 @patch.object(RapidapiSource, 'load_data', mock_load('RapidapiSource'))
 @patch.object(GithubSource, 'load_data', mock_load('GithubSource'))
+@patch.object(StopcoronaSource, 'load_data', mock_load('StopcoronaSource'))
 async def aggr():
     aggr = Aggregator()
     await aggr.load_sources()

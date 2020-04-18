@@ -15,25 +15,25 @@ from tests.mocks import mock_load
 def mocked_info():
     info = [
         {
-            'key': 'all', 'country': 'Мир', 'number': 0,
+            'key': 'all', 'name': 'Мир', 'number': 0,
             'total_cases': 723319, 'new_cases': '+960',
             'recovered_cases': 101010,
             'total_deaths': 33993, 'new_deaths': '+5001',
         },
         {
-            'key': 'usa', 'country': 'США', 'number': 1,
+            'key': 'usa', 'name': 'США', 'number': 1,
             'total_cases': 112560, 'new_cases': '+8434',
             'recovered_cases': 3219,
             'total_deaths': 1878, 'new_deaths': '+182',
         },
         {
-            'key': 'italy', 'country': 'Италия', 'number': 2,
+            'key': 'italy', 'name': 'Италия', 'number': 2,
             'total_cases': 86498, 'new_cases': '+5909',
             'recovered_cases': 10950,
             'total_deaths': 9134, 'new_deaths': '+919',
         },
         {
-            'key': 'china', 'country': 'Китай', 'number': 3,
+            'key': 'china', 'name': 'Китай', 'number': 3,
             'total_cases': 81394, 'new_cases': '+54',
             'recovered_cases': 74971,
             'total_deaths': 3295, 'new_deaths': '+3',

@@ -51,7 +51,7 @@ class Patterns:
 
     def _country_details(self, info: CountryInfo) -> str:
         return (
-            f"*{info['country']}*\n\n"
+            f"*{info['name']}*\n\n"
             + self._detailed([
                 ('Всего подтвержденных случаев', 'total_cases'),
                 ('Новые случаи за сегодня', 'new_cases'),
@@ -99,7 +99,7 @@ class Patterns:
         def wrapped(self, argument, *args, **kwargs) -> str:
             if type(argument) == list:
                 return '\n'.join(
-                    [function(self, i, *args, **kwargs)for i in argument]
+                    [function(self, i, *args, **kwargs) for i in argument]
                 )
             else:
                 return function(self, argument, *args, **kwargs)
@@ -133,7 +133,7 @@ class Patterns:
     ) -> str:
 
         line = self._with_delimiter(int(info['total_cases']))
-        line = line + '  ' + str(info['country'])
+        line = line + '  ' + str(info['name'])
         if bald:
             line = '*' + line + '*'
         line += '    -> ' + self._link(info)
