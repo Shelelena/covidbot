@@ -98,9 +98,9 @@ class Patterns:
     def _vectorize(function):
         def wrapped(self, argument, *args, **kwargs) -> str:
             if type(argument) == list:
-                return '\n'.join(
-                    [function(self, i, *args, **kwargs) for i in argument]
-                )
+                result = [function(self, i, *args, **kwargs) for i in argument]
+                result = list(filter(lambda i: i is not None, result))
+                return '\n'.join(result)
             else:
                 return function(self, argument, *args, **kwargs)
         return wrapped
@@ -113,6 +113,9 @@ class Patterns:
     ) -> str:
 
         label, name = format
+        if name not in info:
+            return None
+
         data = info[name]
         if data is None:
             data = 'Нет'

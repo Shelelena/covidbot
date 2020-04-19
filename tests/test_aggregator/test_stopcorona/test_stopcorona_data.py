@@ -51,7 +51,7 @@ async def test_sropcorona_prepare_data():
     assert 50 < len(data) < 150
     assert list(data.total_cases) == sorted(
         list(data.total_cases), reverse=True)
-    assert list(data.number) == list(range(len(data)))
+    assert list(data.number) == list(range(1, len(data)+1))
 
     for row in rows:
         assert re.match(r'^[А-Яа-я \-\(\)]+$', row['name'])

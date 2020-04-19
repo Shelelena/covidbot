@@ -83,7 +83,7 @@ def test_get_countries_by_keys(rapidapi):
         assert len(result) == len(keys)
 
         result_keys = [country['key'] for country in result]
-        assert set(keys) == set(result_keys)
+        assert keys == set(result_keys)
 
 
 def test_get_single_countries(rapidapi):

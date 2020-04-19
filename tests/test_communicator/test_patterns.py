@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from typing import List
+from typing import List, Union
 from typeguard import check_type
 
 from communicator.patterns import Patterns
@@ -8,6 +8,8 @@ from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
 from aggregator.rapidapisource.schemas import RapidapiCountryInfo
 from aggregator.githubsource import GithubSource
+from aggregator.stopcoronasource import StopcoronaSource
+from aggregator.stopcoronasource.schemas import StopcoronaRegionInfo
 from tests.mocks import mock_load
 
 
@@ -38,14 +40,34 @@ def mocked_info():
             'recovered_cases': 74971,
             'total_deaths': 3295, 'new_deaths': '+3',
         },
+        {
+            'key': 'russia', 'name': 'Россия', 'number': 4,
+            'total_cases': 42853, 'new_cases': '+6060',
+            'recovered_cases': 3291,
+            'total_deaths': 361, 'new_deaths': '+48',
+        },
+        {
+            'key': 'moskva', 'name': 'Москва', 'number': 1,
+            'total_cases': 24324,
+            'recovered_cases': 1763,
+            'total_deaths': 176,
+        },
+        {
+            'key': 'sanktpeterburg', 'name': 'Санкт-Петербург', 'number': 2,
+            'total_cases': 1760,
+            'recovered_cases': 239,
+            'total_deaths': 8,
+        },
     ]
-    check_type(None, info, List[RapidapiCountryInfo])
+    check_type(None, info, List[Union[
+        RapidapiCountryInfo, StopcoronaRegionInfo]])
     return info
 
 
 @pytest.fixture
 @patch.object(RapidapiSource, 'load_data', mock_load('RapidapiSource'))
 @patch.object(GithubSource, 'load_data', mock_load('GithubSource'))
+@patch.object(StopcoronaSource, 'load_data', mock_load('StopcoronaSource'))
 async def aggr():
     aggr = Aggregator()
     await aggr.load_sources()
@@ -92,9 +114,9 @@ def test_country_pattern(mocked_info):
     )
 
 
-def test_world_pattern_on_aggregator(mocked_info):
+def test_world_pattern(mocked_info):
     info = mocked_info[0]
-    rating = mocked_info[1:]
+    rating = mocked_info[1:4]
     world = Patterns().world(info, rating)
     assert world == (
         '*Мир*\n\n'
@@ -112,8 +134,8 @@ def test_world_pattern_on_aggregator(mocked_info):
     )
 
 
-def test_rating_pattern_on_aggregator(mocked_info):
-    rating = mocked_info[1:]
+def test_rating_pattern(mocked_info):
+    rating = mocked_info[1:4]
     world = mocked_info[0]
     result = Patterns().rating(rating, world)
     assert result == (
@@ -121,4 +143,29 @@ def test_rating_pattern_on_aggregator(mocked_info):
         '`1.`  112 560  США    -> /c\\_usa\n'
         '`2.`  86 498  Италия    -> /c\\_italy\n'
         '`3.`  81 394  Китай    -> /c\\_china'
+    )
+
+
+def test_region_pattern(mocked_info):
+    info = mocked_info[5]
+    region = Patterns().country(info)
+    assert region == (
+        '*Москва*\n\n'
+        'Всего подтвержденных случаев:\n24 324\n'
+        'Всего погибших:\n176\n'
+        'Выздоровевшие:\n1 763\n\n'
+        '/c\\_moskva - обновить данные\n'
+        '/all - статистика по миру\n'
+        '/rating - рейтинг стран'
+    )
+
+
+def test_region_rating_pattern(mocked_info):
+    rating = mocked_info[5:7]
+    world = mocked_info[4]
+    result = Patterns().rating(rating, world)
+    assert result == (
+        '*42 853  Россия*    -> /c\\_russia\n\n'
+        '`1.`  24 324  Москва    -> /c\\_moskva\n'
+        '`2.`  1 760  Санкт-Петербург    -> /c\\_sanktpeterburg'
     )
