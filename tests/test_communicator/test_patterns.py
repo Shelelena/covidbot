@@ -6,7 +6,7 @@ from typeguard import check_type
 from communicator.patterns import Patterns
 from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
-from aggregator.rapidapisource.schemas import RapidapiCountryInfo
+from aggregator.schemas import CountryInfo
 from aggregator.githubsource import GithubSource
 from aggregator.stopcoronasource import StopcoronaSource
 from aggregator.stopcoronasource.schemas import StopcoronaRegionInfo
@@ -60,7 +60,7 @@ def mocked_info():
         },
     ]
     check_type(None, info, List[Union[
-        RapidapiCountryInfo, StopcoronaRegionInfo]])
+        CountryInfo, StopcoronaRegionInfo]])
     return info
 
 
@@ -116,8 +116,8 @@ def test_country_pattern(mocked_info):
 
 def test_world_pattern(mocked_info):
     info = mocked_info[0]
-    rating = mocked_info[1:4]
-    world = Patterns().world(info, rating)
+    subrating = mocked_info[1:4]
+    world = Patterns().country(info, subrating)
     assert world == (
         '*Мир*\n\n'
         'Всего подтвержденных случаев:\n723 319\n'
@@ -125,7 +125,7 @@ def test_world_pattern(mocked_info):
         'Всего погибших:\n33 993\n'
         'Погибшие за сегодня:\n5 001\n'
         'Выздоровевшие:\n101 010\n\n'
-        '*Топ 5 стран*\n\n'
+        '*Топ 3*\n\n'
         '`1.`  112 560  США    -> /c\\_usa\n'
         '`2.`  86 498  Италия    -> /c\\_italy\n'
         '`3.`  81 394  Китай    -> /c\\_china\n\n'
@@ -165,7 +165,7 @@ def test_region_rating_pattern(mocked_info):
     world = mocked_info[4]
     result = Patterns().rating(rating, world)
     assert result == (
-        '*42 853  Россия*    -> /c\\_russia\n\n'
+        '*42 853  Россия*    -> /russia\n\n'
         '`1.`  24 324  Москва    -> /c\\_moskva\n'
         '`2.`  1 760  Санкт-Петербург    -> /c\\_sanktpeterburg'
     )

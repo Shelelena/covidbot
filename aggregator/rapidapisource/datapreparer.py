@@ -2,7 +2,7 @@ import json
 import pandas as pd
 import logging
 
-from .schemas import RapidapiResponse
+from aggregator.schemas import RapidapiResponse
 from aggregator.matcher import CountryNameMatcher
 
 

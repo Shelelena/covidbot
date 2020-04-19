@@ -1,7 +1,7 @@
 from typing import TypedDict, List, Optional
 
 
-class RapidapiCountryInfo(TypedDict):
+class CountryInfo(TypedDict):
     key: str
     name: str
     number: int

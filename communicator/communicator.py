@@ -51,13 +51,11 @@ class Communicator:
             return await self._send_error_message(message, info)
         else:
             graph = self.aggregator.graph(country)
-            if info['key'] == 'all':
-                rating = self.aggregator.rating(1, 5)
-                sent_message = await self._send_world_message(
-                    message, info, rating, graph)
-            else:
-                sent_message = await self._send_country_message(
-                    message, info, graph)
+            subrating = self.aggregator.rating(1, 5, parent=info['key'])
+
+            sent_message = await self._send_country_message(
+                message, info, subrating=subrating, graph=graph)
+
             self._save_graph_id(graph, info['key'], sent_message)
             return sent_message
 
@@ -68,7 +66,8 @@ class Communicator:
     ) -> Message:
 
         world = self.aggregator.country('all')
-        rating = self.aggregator.rating(1, self._max_countries_on_rating_page)
+        rating = self.aggregator.rating(
+            1, self._max_countries_on_rating_page)
         keyboard = self.keyboard.create()
 
         return await self._send_rating_message(
@@ -99,29 +98,15 @@ class Communicator:
         self,
         message: Message,
         info: CountryInfo,
+        subrating: List[CountryInfo] = None,
         graph: Union[Path, str, None] = None
     ) -> Message:
 
         return await self._send_message(
             message,
-            text=self.patterns.country(info),
+            text=self.patterns.country(info, subrating),
             parse_mode="Markdown",
             photo=graph
-        )
-
-    async def _send_world_message(
-        self,
-        message: Message,
-        info: CountryInfo,
-        rating: List[CountryInfo],
-        graph=None
-    ) -> Message:
-
-        return await self._send_message(
-            message,
-            text=self.patterns.world(info, rating),
-            parse_mode="Markdown",
-            photo=graph,
         )
 
     async def _send_error_message(

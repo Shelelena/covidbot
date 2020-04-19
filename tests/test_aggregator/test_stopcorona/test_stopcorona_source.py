@@ -72,7 +72,7 @@ def test_get_single_regions(stopcorona):
     data = stopcorona.data
 
     for _ in range(5):
-        key = random.choice(data.key)
+        key = random.choice(list(data.key))
 
         result = stopcorona.single_region(key)
         check_type(None, result, StopcoronaRegionInfo)

@@ -9,9 +9,10 @@ from httpx._exceptions import ReadTimeout, ConnectTimeout
 
 from aggregator import Aggregator
 from aggregator.rapidapisource import RapidapiSource
-from aggregator.rapidapisource.schemas import RapidapiCountryInfo
+from aggregator.schemas import CountryInfo
 from aggregator.githubsource import GithubSource
 from aggregator.stopcoronasource import StopcoronaSource
+from aggregator.stopcoronasource.schemas import StopcoronaRegionInfo
 from tests.mocks import mock_load
 from exceptions import CountryNotFound
 
@@ -31,11 +32,13 @@ async def aggr():
 @patch.object(logging, 'exception', Mock())
 @patch.object(RapidapiSource, 'update', AsyncMock())
 @patch.object(GithubSource, 'update', AsyncMock())
+@patch.object(StopcoronaSource, 'update', AsyncMock())
 async def test_update():
     aggr = Aggregator()
     await aggr.update()
     aggr._rapidapi.update.assert_called_once()
     aggr._github.update.assert_called_once()
+    aggr._stopcorona.update.assert_called_once()
 
     with patch.object(RapidapiSource, 'update', _async_raise(ReadTimeout)):
         aggr = Aggregator()
@@ -58,8 +61,20 @@ def test_get_country(aggr):
         country = random.choice(list(aggr._rapidapi._matcher.keys()))
         result = aggr.country(country)
 
-        check_type(None, result, RapidapiCountryInfo)
+        check_type(None, result, CountryInfo)
         assert result['key'] == country
+
+    wrong_result = aggr.country('oz')
+    assert wrong_result == {'error': 'Страна не найдена'}
+
+
+def test_get_region(aggr):
+    for _ in range(5):
+        region = random.choice(list(aggr._stopcorona.data.name))
+        result = aggr.country(region)
+
+        check_type(None, result, StopcoronaRegionInfo)
+        assert result['name'] == region
 
     wrong_result = aggr.country('oz')
     assert wrong_result == {'error': 'Страна не найдена'}
@@ -67,7 +82,15 @@ def test_get_country(aggr):
 
 def test_get_rating(aggr):
     rating = aggr.rating(1, 5)
-    check_type(None, rating, List[RapidapiCountryInfo])
+    check_type(None, rating, List[CountryInfo])
+
+    total_cases = [i['total_cases'] for i in rating]
+    assert total_cases == sorted(total_cases, reverse=True)
+
+
+def test_get_region_rating(aggr):
+    rating = aggr.rating(1, 5, parent='russia')
+    check_type(None, rating, List[StopcoronaRegionInfo])
 
     total_cases = [i['total_cases'] for i in rating]
     assert total_cases == sorted(total_cases, reverse=True)

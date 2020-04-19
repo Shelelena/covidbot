@@ -38,9 +38,12 @@ async def test_country(comm):
     await comm.send_country(message, 'country_1')
 
     comm.aggregator.country.assert_called_once_with('country_1')
+    info = comm.aggregator.country()
+
+    comm.aggregator.rating.assert_called_once_with(1, 5, parent=info['key'])
     comm.aggregator.graph.assert_called_once_with('country_1')
     comm.patterns.country.assert_called_once_with(
-        comm.aggregator.country())
+        comm.aggregator.country(), comm.aggregator.rating())
     message.answer_photo.assert_called_once_with(
         photo=comm.aggregator.graph(),
         caption=comm.patterns.country(),
@@ -69,24 +72,6 @@ async def test_country_with_graph_sent_first_time(comm, tmp_path):
     await comm.send_country(message, 'country_5')
 
     comm.aggregator.save_graph_id.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_world(comm):
-    comm.aggregator.country.return_value = {'key': 'all'}
-    message = AsyncMock()
-    await comm.send_country(message, 'country_3')
-
-    comm.aggregator.country.assert_called_once_with('country_3')
-    comm.aggregator.graph.assert_called_once_with('country_3')
-    comm.aggregator.rating.assert_called_once_with(1, 5)
-    comm.patterns.world.assert_called_once_with(
-        comm.aggregator.country(), comm.aggregator.rating())
-    message.answer_photo.assert_called_once_with(
-        photo=comm.aggregator.graph(),
-        caption=comm.patterns.world(),
-        parse_mode="Markdown",
-        reply_markup=None)
 
 
 @pytest.mark.asyncio

@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 
 from .rapidapisource import RapidapiSource
-from .rapidapisource.schemas import RapidapiCountryInfo
+from .schemas import CountryInfo
 from .githubsource import GithubSource
 from .stopcoronasource import StopcoronaSource
 from exceptions import CountryNotFound
@@ -44,21 +44,32 @@ class Aggregator:
     def country(
         self,
         country: str = 'all'
-    ) -> Union[RapidapiCountryInfo, Dict[str, str]]:
+    ) -> Union[CountryInfo, Dict[str, str]]:
 
         try:
             return self._rapidapi.single_country(country)
         except CountryNotFound:
-            return {'error': 'Страна не найдена'}
+            region = country
+
+        try:
+            return self._stopcorona.single_region(region)
+        except CountryNotFound:
+            pass
+
+        return {'error': 'Страна не найдена'}
 
     def rating(
         self,
         start: int = 1,
-        end: int = 10
-    ) -> List[RapidapiCountryInfo]:
-
-        rating = self._rapidapi.countries_by_range(start, end)
-        return rating
+        end: int = 10,
+        parent: str = 'all'
+    ) -> List[CountryInfo]:
+        if parent == 'all':
+            return self._rapidapi.countries_by_range(start, end)
+        elif parent == 'russia':
+            return self._stopcorona.regions_by_range(start, end)
+        else:
+            return None
 
     def graph(self, country: str = 'all') -> Union[Path, str, None]:
         try:

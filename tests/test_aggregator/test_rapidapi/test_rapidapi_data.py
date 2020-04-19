@@ -9,8 +9,8 @@ import logging
 
 from tests.mocks import mock_load
 from aggregator.rapidapisource.datapreparer import RapidapiDataPreparer
-from aggregator.rapidapisource.schemas import RapidapiCountryInfo
-from aggregator.rapidapisource.schemas import RapidapiResponse
+from aggregator.schemas import CountryInfo
+from aggregator.schemas import RapidapiResponse
 from aggregator.matcher import CountryNameMatcher
 
 
@@ -39,7 +39,7 @@ async def test_rapidapi_prepare_data():
     assert type(data) == pd.DataFrame
 
     rows = data.to_dict(orient='records')
-    check_type(None, rows, List[RapidapiCountryInfo])
+    check_type(None, rows, List[CountryInfo])
 
     assert set(data.key) - matcher.keys() == set()
     assert len(data) > 200

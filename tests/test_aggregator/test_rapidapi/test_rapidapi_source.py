@@ -8,7 +8,7 @@ import httpx
 
 from tests.mocks import mock_load
 from aggregator.rapidapisource import RapidapiSource
-from aggregator.rapidapisource.schemas import RapidapiCountryInfo
+from aggregator.schemas import CountryInfo
 from exceptions import NoRapidapiKey, CountryNotFound
 
 
@@ -47,7 +47,7 @@ def test_get_range_of_countries(rapidapi):
         start, end = sorted(random.choices(range(201), k=2))
 
         result = rapidapi.countries_by_range(start, end)
-        check_type(None, result, List[RapidapiCountryInfo])
+        check_type(None, result, List[CountryInfo])
         assert len(result) == end - start + 1
 
         total_cases = [country['total_cases'] for country in result]
@@ -79,7 +79,7 @@ def test_get_countries_by_keys(rapidapi):
         keys = set(keys)
 
         result = rapidapi.countries_by_keys(*keys)
-        check_type(None, result, List[RapidapiCountryInfo])
+        check_type(None, result, List[CountryInfo])
         assert len(result) == len(keys)
 
         result_keys = [country['key'] for country in result]
@@ -93,7 +93,7 @@ def test_get_single_countries(rapidapi):
         key = random.choice(data.key)
 
         result = rapidapi.single_country(key)
-        check_type(None, result, RapidapiCountryInfo)
+        check_type(None, result, CountryInfo)
         assert result['key'] == key
 
 

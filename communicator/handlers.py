@@ -4,7 +4,7 @@ from .logger import log
 def register_handlers(communicator, dispatcher):
     dp = dispatcher
 
-    @dp.message_handler(commands=['start', 'help', 'all', 'rating'])
+    @dp.message_handler(commands=['start', 'help', 'all', 'rating', 'russia'])
     @log
     async def handle_commands(message, command):
         if command.command == 'start':
@@ -15,6 +15,9 @@ def register_handlers(communicator, dispatcher):
 
         elif command.command == 'all':
             await communicator.send_country(message, 'all')
+
+        elif command.command == 'russia':
+            await communicator.send_country(message, 'russia')
 
         elif command.command == 'rating':
             await communicator.send_rating(message)

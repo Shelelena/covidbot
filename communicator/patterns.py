@@ -12,6 +12,8 @@ class Patterns:
     def _link(self, info: CountryInfo) -> str:
         if info['key'] == 'all':
             return '/all'
+        if info['key'] == 'russia':
+            return '/russia'
         return '/c\\_' + str(info['key'])
 
     def greeting(self) -> str:
@@ -30,7 +32,7 @@ class Patterns:
         return (
             '/all - статистика по миру\n'
             '/rating - рейтинг стран по заболеваемости\n'
-            '/c_russia - статистика по России\n'
+            '/russia - статистика по России\n'
             '/help - эта справка\n\n'
             'Чтобы получить текущую информацию по любой стране, введите '
             'название страны. Для получения информации по миру, введите '
@@ -41,13 +43,18 @@ class Patterns:
             'Баг репорт - ' + MY_TELEGRAM_USERNAME
         )
 
-    def country(self, info: CountryInfo) -> str:
-        return (
-            self._country_details(info)
-            + '\n' + self._reload(info)
-            + self._go_to_all()
-            + self._go_to_rating()
-        )
+    def country(
+        self,
+        info: CountryInfo,
+        subrating: List[CountryInfo] = None
+    ) -> str:
+
+        pattern = self._country_details(info)
+        if subrating:
+            pattern += f'\n\n*Топ {len(subrating)}*\n\n'
+            pattern += self.rating(subrating)
+        pattern += self._navigation_links(info)
+        return pattern
 
     def _country_details(self, info: CountryInfo) -> str:
         return (
@@ -61,19 +68,15 @@ class Patterns:
             ], info)
         )
 
-    def world(
-        self,
-        info: CountryInfo,
-        rating: List[CountryInfo],
-    ) -> str:
+    def _navigation_links(self, info: CountryInfo = None):
+        if info is None:
+            return '\n' + self._go_to_all() + self._go_to_russia()
 
-        return (
-            self._country_details(info)
-            + '\n\n*Топ 5 стран*\n\n'
-            + self.rating(rating)
-            + '\n' + self._reload(info)
-            + self._go_to_rating()
-        )
+        links = '\n' + self._reload(info)
+        if info['key'] != 'all':
+            links += self._go_to_all()
+        links += self._go_to_rating()
+        return links
 
     def rating(
         self,
@@ -157,7 +160,7 @@ class Patterns:
         return '\n/all - статистика по миру'
 
     def _go_to_russia(self) -> str:
-        return '\n/c_russia - статистика по России'
+        return '\n/russia - статистика по России'
 
     def _go_to_help(self) -> str:
         return '\n/help - справка'
