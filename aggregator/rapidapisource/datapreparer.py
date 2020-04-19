@@ -93,6 +93,7 @@ class RapidapiDataPreparer:
         data = data.sort_values('total_cases', ascending=False)
         data = data.reset_index(drop=True)
         data['number'] = list(range(len(data)))
+        data['type'] = ['country'] * len(data)
         return data
 
     @staticmethod

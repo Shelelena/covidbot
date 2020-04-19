@@ -8,7 +8,7 @@ import httpx
 
 from tests.mocks import mock_load
 from aggregator.stopcoronasource import StopcoronaSource
-from aggregator.stopcoronasource.schemas import StopcoronaRegionInfo
+from aggregator.schemas import RegionInfo
 from exceptions import CountryNotFound
 
 
@@ -40,7 +40,7 @@ def test_get_range_of_regions(stopcorona):
         start, end = sorted(random.choices(range(1, 81), k=2))
 
         result = stopcorona.regions_by_range(start, end)
-        check_type(None, result, List[StopcoronaRegionInfo])
+        check_type(None, result, List[RegionInfo])
         assert len(result) == end - start + 1
 
         total_cases = [region['total_cases'] for region in result]
@@ -61,7 +61,7 @@ def test_get_regions_by_keys(stopcorona):
         keys = set(keys)
 
         result = stopcorona.regions_by_keys(*keys)
-        check_type(None, result, List[StopcoronaRegionInfo])
+        check_type(None, result, List[RegionInfo])
         assert len(result) == len(keys)
 
         result_keys = [country['key'] for country in result]
@@ -75,7 +75,7 @@ def test_get_single_regions(stopcorona):
         key = random.choice(list(data.key))
 
         result = stopcorona.single_region(key)
-        check_type(None, result, StopcoronaRegionInfo)
+        check_type(None, result, RegionInfo)
         assert result['key'] == key
 
 

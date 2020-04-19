@@ -71,6 +71,14 @@ class Aggregator:
         else:
             return None
 
+    def rating_length(self, parent: str = 'all') -> int:
+        if parent == 'all':
+            return len(self._rapidapi.data)
+        elif parent == 'russia':
+            return len(self._stopcorona.data)
+        else:
+            return 0
+
     def graph(self, country: str = 'all') -> Union[Path, str, None]:
         try:
             return self._github.graph(country)

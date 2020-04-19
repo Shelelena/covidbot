@@ -88,13 +88,21 @@ async def test_country_statistics_with_error(comm):
 @pytest.mark.asyncio
 async def test_rating_message(comm):
     message = AsyncMock()
-    await comm.send_rating(message)
+    await comm.send_rating(message, parent='russia')
 
-    comm.aggregator.country.assert_called_once_with('all')
-    comm.aggregator.rating.assert_called_once_with(1, 20)
+    comm.aggregator.country.assert_called_once_with('russia')
+    comm.aggregator.rating.assert_called_once_with(1, 20, parent='russia')
+    comm.aggregator.rating_length.assert_called_once_with('russia')
     comm.patterns.rating.assert_called_once_with(
         comm.aggregator.rating(), comm.aggregator.country())
-    comm.keyboard.create.assert_called_once_with()
+
+    rating_length = comm.aggregator.rating_length()
+    comm.keyboard.create.assert_called_once_with(
+        current_page=1,
+        max_pages=-(-rating_length//comm._max_countries_on_rating_page),
+        parent='russia'
+    )
+
     message.answer.assert_called_once_with(
         comm.patterns.rating(),
         parse_mode="Markdown",
@@ -105,15 +113,20 @@ async def test_rating_message(comm):
 @pytest.mark.asyncio
 async def test_rating_turn_page(comm):
     query = AsyncMock()
-    await comm.turn_rating_page(query, page='3')
+    await comm.turn_rating_page(
+        query,
+        callback=dict(page='3', max_pages='10', parent='all')
+    )
 
     comm.aggregator.country.assert_called_once_with('all')
-    comm.aggregator.rating.assert_called_once_with(41, 60)
+    comm.aggregator.rating.assert_called_once_with(41, 60, parent='all')
     comm.patterns.rating.assert_called_once_with(
         comm.aggregator.rating(), comm.aggregator.country())
-    comm.keyboard.create.assert_called_once_with(3)
+    comm.keyboard.create.assert_called_once_with(3, 10, 'all')
     query.message.edit_text.assert_called_once_with(
         text=comm.patterns.rating(),
         parse_mode="Markdown",
         reply_markup=comm.keyboard.create()
     )
+
+    assert not comm.aggregator.rating_length.called

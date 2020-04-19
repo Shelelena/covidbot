@@ -8,7 +8,7 @@ import pandas as pd
 
 from tests.mocks import mock_load
 from aggregator.stopcoronasource.datapreparer import StopcoronaDataPreparer
-from aggregator.stopcoronasource.schemas import StopcoronaRegionInfo
+from aggregator.schemas import RegionInfo
 
 
 mock_load_stopcorona = mock_load('StopcoronaSource')
@@ -46,7 +46,7 @@ async def test_sropcorona_prepare_data():
     assert type(data) == pd.DataFrame
 
     rows = data.to_dict(orient='records')
-    check_type(None, rows, List[StopcoronaRegionInfo])
+    check_type(None, rows, List[RegionInfo])
 
     assert 50 < len(data) < 150
     assert list(data.total_cases) == sorted(

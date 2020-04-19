@@ -22,6 +22,7 @@ class StopcoronaDataPreparer:
         key = key.replace('oblast', '')
         key = key.replace('respublika', '')
         key = key.replace('avtonomnyjokrug', '')
+        key = key.replace('kraj', '')
         return key
 
     @staticmethod
@@ -49,7 +50,6 @@ class StopcoronaDataPreparer:
     def _set_keys(cls, data) -> pd.DataFrame:
         data = data.copy()
         data['key'] = data.name.map(cls.translit_name)
-
         return data
 
     @staticmethod
@@ -57,4 +57,5 @@ class StopcoronaDataPreparer:
         data = data.sort_values('total_cases', ascending=False)
         data['number'] = list(range(1, len(data)+1))
         data.index = data.number
+        data['type'] = ['region'] * len(data)
         return data

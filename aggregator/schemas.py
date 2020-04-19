@@ -1,16 +1,28 @@
-from typing import TypedDict, List, Optional
+from typing import TypedDict, List, Optional, Literal
 
 
 class CountryInfo(TypedDict):
     key: str
     name: str
     number: int
+    type: Literal['country']
 
     total_cases: int
     new_cases: Optional[str]
     recovered_cases: int
     total_deaths: int
     new_deaths: Optional[str]
+
+
+class RegionInfo(TypedDict):
+    key: str
+    name: str
+    number: int
+    type: Literal['region']
+
+    total_cases: int
+    recovered_cases: int
+    total_deaths: int
 
 
 class RapidapiResponse(TypedDict):

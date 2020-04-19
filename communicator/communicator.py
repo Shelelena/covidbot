@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Optional, List, Tuple, Literal
+from typing import Union, Optional, List, Tuple, Literal, Dict
 from pathlib import Path
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 
@@ -62,13 +62,18 @@ class Communicator:
     @catch_uncatched
     async def send_rating(
         self,
-        message: Message
+        message: Message,
+        parent: str = 'all'
     ) -> Message:
 
-        world = self.aggregator.country('all')
+        world = self.aggregator.country(parent)
         rating = self.aggregator.rating(
-            1, self._max_countries_on_rating_page)
-        keyboard = self.keyboard.create()
+            1, self._max_countries_on_rating_page, parent=parent)
+        keyboard = self.keyboard.create(
+            current_page=1,
+            max_pages=self._max_pages_in_rating(parent),
+            parent=parent,
+        )
 
         return await self._send_rating_message(
             message, rating, world, keyboard)
@@ -77,17 +82,20 @@ class Communicator:
     async def turn_rating_page(
         self,
         query: CallbackQuery,
-        page: str = '1'
+        callback: Dict[str, str],
     ) -> Message:
 
-        if page == self.keyboard.current_page_name:
+        if callback['page'] == self.keyboard.current_page_name:
             return await self._send_no_changes(query)
-        page = int(page)
+        page = int(callback['page'])
+        max_pages = int(callback['max_pages'])
+        parent = callback['parent']
 
-        world = self.aggregator.country('all')
+        world = self.aggregator.country(parent)
         rating = self.aggregator.rating(
-            *self._countries_on_page(page))
-        keyboard = self.keyboard.create(page)
+            *self._countries_on_page(page), parent=parent)
+        keyboard = self.keyboard.create(
+            page, max_pages, parent)
 
         return await self._edit_rating_message(
             query.message,
@@ -183,6 +191,11 @@ class Communicator:
             (page-1) * self._max_countries_on_rating_page + 1,
             page * self._max_countries_on_rating_page
         )
+
+    def _max_pages_in_rating(self, parent) -> int:
+        rating_length = self.aggregator.rating_length(parent)
+        max_page = - (- rating_length // self._max_countries_on_rating_page)
+        return max_page
 
     def _find_message(self, *args, **kwargs) -> Message:
         if 'message' in kwargs:

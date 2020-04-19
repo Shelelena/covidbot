@@ -6,7 +6,7 @@ import pandas as pd
 from aggregator.sources import Source
 from aggregator.matcher import CountryNameMatcher
 from .datapreparer import StopcoronaDataPreparer
-from .schemas import StopcoronaRegionInfo
+from aggregator.schemas import RegionInfo
 from exceptions import CountryNotFound
 
 
@@ -20,7 +20,7 @@ class StopcoronaSource(Source):
         if self._matcher is None:
             self._matcher = CountryNameMatcher()
 
-    def single_region(self, name) -> StopcoronaRegionInfo:
+    def single_region(self, name) -> RegionInfo:
         key = StopcoronaDataPreparer.translit_name(name)
         region: list = self.regions_by_keys(key)
         if len(region) == 0:
@@ -31,7 +31,7 @@ class StopcoronaSource(Source):
     def regions_by_keys(
         self,
         *keys: List[str]
-    ) -> List[StopcoronaRegionInfo]:
+    ) -> List[RegionInfo]:
 
         selected_regions = self.data[self.data.key.isin(keys)]
         region_dicts: list = selected_regions.to_dict(orient='records')
@@ -41,7 +41,7 @@ class StopcoronaSource(Source):
         self,
         start=1,
         end=10
-    ) -> List[StopcoronaRegionInfo]:
+    ) -> List[RegionInfo]:
 
         range_data = self.data.loc[start:end]
         range_data = range_data.to_dict(orient='records')

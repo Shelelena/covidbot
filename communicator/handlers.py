@@ -4,7 +4,8 @@ from .logger import log
 def register_handlers(communicator, dispatcher):
     dp = dispatcher
 
-    @dp.message_handler(commands=['start', 'help', 'all', 'rating', 'russia'])
+    @dp.message_handler(commands=[
+        'start', 'help', 'all', 'russia', 'rating', 'countries', 'regions'])
     @log
     async def handle_commands(message, command):
         if command.command == 'start':
@@ -19,8 +20,12 @@ def register_handlers(communicator, dispatcher):
         elif command.command == 'russia':
             await communicator.send_country(message, 'russia')
 
-        elif command.command == 'rating':
-            await communicator.send_rating(message)
+        elif (command.command == 'countries'
+                or command.command == 'rating'):
+            await communicator.send_rating(message, parent='all')
+
+        elif command.command == 'regions':
+            await communicator.send_rating(message, parent='russia')
 
     @dp.message_handler(regexp=communicator.patterns.country_command)
     @log
@@ -34,18 +39,15 @@ def register_handlers(communicator, dispatcher):
     @dp.message_handler(content_types=['text'])
     @log
     async def handle_messages(message):
-        if message.text.lower() in ('rating', 'рейтинг'):
-            await communicator.send_rating(message)
-        else:
-            await communicator.send_country(
-                message,
-                country=message.text
-            )
+        await communicator.send_country(
+            message,
+            country=message.text
+        )
 
     @dp.callback_query_handler(communicator.keyboard.callback.filter())
     @log
     async def turn_rating_page(query, callback_data):
         await communicator.turn_rating_page(
             query=query,
-            page=callback_data['page']
+            callback=callback_data,
         )

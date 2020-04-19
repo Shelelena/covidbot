@@ -12,7 +12,7 @@ from aggregator.rapidapisource import RapidapiSource
 from aggregator.schemas import CountryInfo
 from aggregator.githubsource import GithubSource
 from aggregator.stopcoronasource import StopcoronaSource
-from aggregator.stopcoronasource.schemas import StopcoronaRegionInfo
+from aggregator.schemas import RegionInfo
 from tests.mocks import mock_load
 from exceptions import CountryNotFound
 
@@ -73,7 +73,7 @@ def test_get_region(aggr):
         region = random.choice(list(aggr._stopcorona.data.name))
         result = aggr.country(region)
 
-        check_type(None, result, StopcoronaRegionInfo)
+        check_type(None, result, RegionInfo)
         assert result['name'] == region
 
     wrong_result = aggr.country('oz')
@@ -90,7 +90,7 @@ def test_get_rating(aggr):
 
 def test_get_region_rating(aggr):
     rating = aggr.rating(1, 5, parent='russia')
-    check_type(None, rating, List[StopcoronaRegionInfo])
+    check_type(None, rating, List[RegionInfo])
 
     total_cases = [i['total_cases'] for i in rating]
     assert total_cases == sorted(total_cases, reverse=True)
