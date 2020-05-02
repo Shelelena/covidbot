@@ -109,8 +109,10 @@ class Patterns:
         return (
             f"*{info['name']}*\n\n"
             + self._detailed([
-                ('Подтвержденные случаи', 'total_cases'),
-                ('Погибшие', 'total_deaths'),
+                ('Всего подтвержденных случаев', 'total_cases'),
+                ('Новые случаи за сегодня', 'new_cases'),
+                ('Всего погибших', 'total_deaths'),
+                ('Погибшие за сегодня', 'new_deaths'),
                 ('Выздоровевшие', 'recovered_cases'),
             ], info)
         )

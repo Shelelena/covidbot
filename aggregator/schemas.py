@@ -21,8 +21,10 @@ class RegionInfo(TypedDict):
     type: Literal['region']
 
     total_cases: int
+    new_cases: int
     recovered_cases: int
     total_deaths: int
+    new_deaths: int
 
 
 class RapidapiResponse(TypedDict):
@@ -55,3 +57,17 @@ class RapidapiResponse(TypedDict):
     parameters: list
     results: int
     response: List[ResponseItemSchema]
+
+
+class StopcoronaResponseItems(TypedDict):
+    title: str
+    code: str
+    is_city: bool
+    coord_x: str
+    coord_y: str
+    sick: int
+    healed: int
+    died: int
+    sick_incr: int
+    healed_incr: int
+    died_incr: int

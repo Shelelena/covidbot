@@ -4,11 +4,12 @@ from typeguard import check_type
 
 import re
 from bs4 import BeautifulSoup
+import json
 import pandas as pd
 
 from tests.mocks import mock_load
 from aggregator.stopcoronasource.datapreparer import StopcoronaDataPreparer
-from aggregator.schemas import RegionInfo
+from aggregator.schemas import RegionInfo, StopcoronaResponseItems
 
 
 mock_load_stopcorona = mock_load('StopcoronaSource')
@@ -21,21 +22,16 @@ async def test_stopcorona_load_data_structure():
     assert type(response) == str
     soup = BeautifulSoup(response, 'html.parser')
 
-    region_table = soup.find_all('div', class_='d-map__list')
+    region_table = soup.find_all('cv-spread-overview')
     assert len(region_table) == 1
+    region_table = region_table[0]
 
-    regions = region_table[0].find_all('tr')
-    assert 50 < len(regions) < 150
+    assert ':spread-data' in region_table.attrs
+    json_data: str = region_table.attrs[':spread-data']
+    json_data: dict = json.loads(json_data)
 
-    for region in regions:
-        name = region.find_all('th')
-        assert len(name) == 1
-        assert not name[0].text.isnumeric()
-
-        values = region.find_all('td')
-        assert len(values) == 3
-        for value in values:
-            assert value.text.isnumeric()
+    assert 50 < len(json_data) < 150
+    check_type(None, json_data, List[StopcoronaResponseItems])
 
 
 @pytest.mark.asyncio

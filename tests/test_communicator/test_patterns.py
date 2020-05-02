@@ -54,15 +54,19 @@ def mocked_info():
         {
             'key': 'moskva', 'name': 'Москва', 'number': 1,
             'total_cases': 24324,
+            'new_cases': 1000,
             'recovered_cases': 1763,
             'total_deaths': 176,
+            'new_deaths': 100,
             'type': 'region',
         },
         {
             'key': 'sanktpeterburg', 'name': 'Санкт-Петербург', 'number': 2,
             'total_cases': 1760,
+            'new_cases': 100,
             'recovered_cases': 239,
             'total_deaths': 8,
+            'new_deaths': 50,
             'type': 'region',
         },
     ]
@@ -166,8 +170,10 @@ def test_region_pattern(mocked_info):
     region = Patterns().country(info)
     assert region == (
         '*Москва*\n\n'
-        'Подтвержденные случаи:\n24 324\n'
-        'Погибшие:\n176\n'
+        'Всего подтвержденных случаев:\n24 324\n'
+        'Новые случаи за сегодня:\n1 000\n'
+        'Всего погибших:\n176\n'
+        'Погибшие за сегодня:\n100\n'
         'Выздоровевшие:\n1 763\n\n'
         '/r\\_moskva - обновить данные\n\n'
         '/all - статистика по миру\n'

@@ -15,7 +15,7 @@ USERNAME="shelena"
 SSH_KEY_FILE="/home/$USERNAME/.ssh/id_ed25519"
 SERVER="myserver"
 
-
+ssh-add $SSH_KEY_FILE
 sudo docker-compose build
 
 mkdir -p $LOCAL_DIR
@@ -23,7 +23,6 @@ sudo docker save -o $LOCAL_IMAGE_FILE $IMAGE_NAME
 sudo chown $USERNAME:$USERNAME $LOCAL_IMAGE_FILE
 gzip -f $LOCAL_IMAGE_FILE
 
-ssh-add $SSH_KEY_FILE
 ssh $SERVER "mkdir -p $REMOTE_DIR"
 scp $LOCAL_IMAGE_FILE.gz $SERVER:$REMOTE_DIR
 scp $PROD_DOCKER_COMPOSE $SERVER:$REMOTE_DIR

@@ -1,6 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 from transliterate import translit
+import json
 import re
 
 
@@ -28,21 +29,30 @@ class StopcoronaDataPreparer:
     @staticmethod
     def _html_to_dataframe(data: str) -> pd.DataFrame:
         soup = BeautifulSoup(data, 'html.parser')
-        table = soup.find('div', class_='d-map__list')
-        rows = table.find_all('tr')
-        rows = [row.find_all(['th', 'td']) for row in rows]
-        rows = [[value.text for value in row] for row in rows]
-        data = pd.DataFrame(rows)
+        data = soup.find('cv-spread-overview')
+        data = data.attrs[':spread-data']
+        data = json.loads(data)
+        data = pd.DataFrame(data)
         return data
 
     @staticmethod
     def _set_column_names_and_types(data) -> pd.DataFrame:
         data = data.copy()
-        data.columns = [
-            'name', 'total_cases', 'recovered_cases', 'total_deaths']
+        columns = ['title', 'sick', 'sick_incr', 'healed', 'died', 'died_incr']
+        data = data[data.columns.intersection(columns)]
+        data = data.rename(columns={
+            'title': 'name',
+            'sick': 'total_cases',
+            'sick_incr': 'new_cases',
+            'healed': 'recovered_cases',
+            'died': 'total_deaths',
+            'died_incr': 'new_deaths',
+        })
         data.total_cases = data.total_cases.astype(int)
+        data.new_cases = data.new_cases.astype(int)
         data.recovered_cases = data.recovered_cases.astype(int)
         data.total_deaths = data.total_deaths.astype(int)
+        data.new_deaths = data.new_deaths.astype(int)
         data.name = data.name.str.replace('—', '-')
         return data
 

@@ -50,7 +50,7 @@ class StopcoronaSource(Source):
     async def load_data(self) -> str:
         async with httpx.AsyncClient() as client:
             result = await client.get(
-                "https://стопкоронавирус.рф/",
+                "https://стопкоронавирус.рф/information/",
             )
         return result.text
 
